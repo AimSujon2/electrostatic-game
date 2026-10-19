@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>স্থির তড়িৎ বিশ্লেষক &mdash; কুলম্বের বল ও তড়িৎ প্রাবল্য ক্যালকুলেটর</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:ital@0;1&family=Noto+Sans+Bengali:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Tiro Bangla', 'Noto Sans Bengali', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+      line-height: 1.65;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .math-sci {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, 'Tiro Bangla', sans-serif;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .vec {
+      position: relative;
+      display: inline-block;
+      font-weight: 700;
+      font-style: italic;
+      padding-top: 0.12em;
+      margin: 0 0.04em;
+    }
+    .vec::after {
+      content: "";
+      position: absolute;
+      top: 0.06em;
+      left: 0;
+      right: 1px;
+      height: 1.5px;
+      background-color: currentColor;
+    }
+    .vec::before {
+      content: "";
+      position: absolute;
+      top: calc(0.06em - 2px);
+      right: -1px;
+      border-top: 2.5px solid transparent;
+      border-bottom: 2.5px solid transparent;
+      border-left: 4.5px solid currentColor;
+    }
+    .sqrt-box {
+      display: inline-flex;
+      align-items: baseline;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    .sqrt-rad {
+      font-weight: 700;
+      margin-right: 1px;
+    }
+    .sqrt-content {
+      border-top: 1.2px solid currentColor;
+      padding: 0 2px;
+    }
+    .math-sci sup {
+      font-size: 0.72em;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+      top: -0.5em;
+      font-weight: 600;
+    }
+    .math-sci sub {
+      font-size: 0.72em;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+      bottom: -0.25em;
+      font-weight: 600;
+    }
+    .formula-box {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      border-left: 4px solid #4f46e5;
+    }
+    input[type="range"] {
+      accent-color: #4f46e5;
+      touch-action: pan-y;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      cursor: pointer;
+    }
+    @media (min-width: 1024px) {
+      input[type="range"]::-webkit-slider-thumb {
+        width: 18px;
+        height: 18px;
+      }
+    }
+    .math-eq {
+      font-family: 'Tiro Bangla', 'Noto Sans Bengali', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      line-height: 1.8;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    svg text {
+      font-family: 'Inter', 'Tiro Bangla', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+    .fraction {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 0.25rem;
+      font-size: 0.92em;
+    }
+    .fraction .num {
+      border-bottom: 1.5px solid currentColor;
+      padding: 0 0.35rem 0.1rem;
+      line-height: 1.2;
+    }
+    .fraction .den {
+      padding: 0.1rem 0.35rem 0;
+      line-height: 1.2;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Header -->
+  <header class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-medium mb-2">
+          <span>পদার্থবিজ্ঞান ২য় পত্র &bull; স্থির তড়িৎ (Electrostatics)</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">দুইটি বিন্দু চার্জের বল ও তড়িৎ তীব্রতা বিশ্লেষক</h1>
+        <p class="text-indigo-200 text-sm mt-1">স্লাইডার ও ম্যানুয়াল বৈজ্ঞানিক সংখ্যা ইনপুটসহ ৫টি গুরুত্বপূর্ণ গাণিতিক প্রশ্নের ধাপে ধাপে সমাধান</p>
+      </div>
+      <div class="w-full md:w-auto">
+        <span class="block md:inline text-xs text-indigo-200 font-medium mb-1.5 md:mb-0 md:mr-1">দ্রুত উদাহরণ প্রিসেট:</span>
+        <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
+          <button type="button" id="presetOppUnequal" class="min-h-[38px] px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-xs font-medium transition border border-white/15 text-center">
+            +4 &mu;C ও -9 &mu;C (বিপরীতধর্মী)
+          </button>
+          <button type="button" id="presetSameUnequal" class="min-h-[38px] px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-xs font-medium transition border border-white/15 text-center">
+            +4 &mu;C ও +9 &mu;C (সমধর্মী)
+          </button>
+          <button type="button" id="presetSameEqual" class="min-h-[38px] px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-xs font-medium transition border border-white/15 text-center">
+            +6 &mu;C ও +6 &mu;C (সমান সমধর্মী)
+          </button>
+          <button type="button" id="presetDipole" class="min-h-[38px] px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-xs font-medium transition border border-white/15 text-center">
+            +6 &mu;C ও -6 &mu;C (দ্বিমেরু)
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile Sticky Quick-Jump Bar -->
+    <nav class="lg:hidden bg-indigo-950/90 border-t border-indigo-800/70 px-3 py-2 sticky top-0 z-30 backdrop-blur">
+      <div class="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar text-xs">
+        <a href="#inputsSection" class="px-3 py-1.5 rounded-lg bg-indigo-800/60 text-indigo-100 font-medium whitespace-nowrap">চার্জ ও দূরত্ব ইনপুট</a>
+        <a href="#diagramSection" class="px-3 py-1.5 rounded-lg bg-indigo-800/60 text-indigo-100 font-medium whitespace-nowrap">ভেক্টর চিত্র</a>
+        <a href="#summarySection" class="px-3 py-1.5 rounded-lg bg-indigo-800/60 text-indigo-100 font-medium whitespace-nowrap">সংক্ষিপ্ত তুলনা</a>
+        <a href="#solutionsContainer" class="px-3 py-1.5 rounded-lg bg-indigo-800/60 text-indigo-100 font-medium whitespace-nowrap">৫টি সমাধান</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Input Controls Section -->
+    <section id="inputsSection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 scroll-mt-14">
+
+      <!-- Charge 1 Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+            <div class="flex items-center gap-2.5">
+              <span id="q1Badge" class="w-9 h-9 rounded-xl bg-rose-600 text-white font-bold flex items-center justify-center shadow-sm math-sci">q<sub>1</sub></span>
+              <div>
+                <h2 class="font-bold text-slate-800 text-base">১ম চার্জের মান (<span class="math-sci">q<sub>1</sub></span>)</h2>
+                <p class="text-xs text-slate-500">সংযোজক রেখার বাম প্রান্তে (<span class="math-sci">x = 0</span>)</p>
+              </div>
+            </div>
+            <div class="flex rounded-lg bg-slate-100 p-0.5 border border-slate-200">
+              <button type="button" id="q1SignPos" class="px-2.5 py-1 rounded-md text-xs font-bold transition bg-rose-600 text-white">+ ধনাত্মক</button>
+              <button type="button" id="q1SignNeg" class="px-2.5 py-1 rounded-md text-xs font-bold transition text-slate-600 hover:text-slate-900">- ঋণাত্মক</button>
+            </div>
+          </div>
+
+          <!-- Live Scientific Display -->
+          <div class="bg-slate-50 rounded-xl p-3 border border-slate-200/80 mb-4 flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">নির্বাচিত মান (SI):</span>
+            <span id="q1LiveDisplay" class="text-base font-bold text-rose-600 math-sci">+4.00 &times; 10<sup>-6</sup> C</span>
+          </div>
+
+          <!-- Mantissa Slider + Manual Input -->
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                <label for="q1MantissaInput">সহগ / সংখ্যা (Mantissa):</label>
+                <span class="text-slate-500">স্লাইডার বা ম্যানুয়াল ইনপুট</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="q1MantissaSlider" min="0" max="100" step="0.1" value="4" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer" />
+                <input type="number" id="q1MantissaInput" step="any" value="4" class="w-24 px-2.5 py-1.5 text-sm font-semibold border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-right math-sci" />
+              </div>
+            </div>
+
+            <!-- Exponent (10^n) Slider + Manual Input -->
+            <div>
+              <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                <label for="q1ExpInput">১০-এর ঘাত (<span class="math-sci">10<sup>n</sup></span> এর <span class="math-sci">n</span>):</label>
+                <span id="q1ExpLabel" class="math-sci text-indigo-600 font-semibold">&times; 10<sup>-6</sup> C</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="q1ExpSlider" min="-15" max="3" step="1" value="-6" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer" />
+                <div class="flex items-center border border-slate-300 rounded-lg px-2 py-1 bg-white">
+                  <span class="text-xs text-slate-500 mr-1 math-sci">10^</span>
+                  <input type="number" id="q1ExpInput" step="1" min="-30" max="30" value="-6" class="w-14 text-sm font-semibold focus:outline-none text-right math-sci" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Unit Quick Buttons -->
+            <div class="pt-1">
+              <span class="block text-[11px] text-slate-500 mb-1.5">দ্রুত একক নির্বাচন (ঘাত পরিবর্তন):</span>
+              <div class="grid grid-cols-5 gap-1.5">
+                <button type="button" data-q="1" data-exp="0" class="q-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition math-sci">C (10<sup>0</sup>)</button>
+                <button type="button" data-q="1" data-exp="-3" class="q-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition math-sci">mC (10<sup>-3</sup>)</button>
+                <button type="button" data-q="1" data-exp="-6" class="q-unit-btn px-2 py-1 text-xs font-medium rounded border border-indigo-500 bg-indigo-50 text-indigo-700 transition math-sci">&mu;C (10<sup>-6</sup>)</button>
+                <button type="button" data-q="1" data-exp="-9" class="q-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition math-sci">nC (10<sup>-9</sup>)</button>
+                <button type="button" data-q="1" data-exp="-12" class="q-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition math-sci">pC (10<sup>-12</sup>)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charge 2 Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+            <div class="flex items-center gap-2.5">
+              <span id="q2Badge" class="w-9 h-9 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center shadow-sm math-sci">q<sub>2</sub></span>
+              <div>
+                <h2 class="font-bold text-slate-800 text-base">২য় চার্জের মান (<span class="math-sci">q<sub>2</sub></span>)</h2>
+                <p class="text-xs text-slate-500">সংযোজক রেখার ডান প্রান্তে (<span class="math-sci">x = d</span>)</p>
+              </div>
+            </div>
+            <div class="flex rounded-lg bg-slate-100 p-0.5 border border-slate-200">
+              <button type="button" id="q2SignPos" class="px-2.5 py-1 rounded-md text-xs font-bold transition text-slate-600 hover:text-slate-900">+ ধনাত্মক</button>
+              <button type="button" id="q2SignNeg" class="px-2.5 py-1 rounded-md text-xs font-bold transition bg-blue-600 text-white">- ঋণাত্মক</button>
+            </div>
+          </div>
+
+          <!-- Live Scientific Display -->
+          <div class="bg-slate-50 rounded-xl p-3 border border-slate-200/80 mb-4 flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">নির্বাচিত মান (SI):</span>
+            <span id="q2LiveDisplay" class="text-base font-bold text-blue-600 math-sci">-9.00 &times; 10<sup>-6</sup> C</span>
+          </div>
+
+          <!-- Mantissa Slider + Manual Input -->
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                <label for="q2MantissaInput">সহগ / সংখ্যা (Mantissa):</label>
+                <span class="text-slate-500">স্লাইডার বা ম্যানুয়াল ইনপুট</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="q2MantissaSlider" min="0" max="100" step="0.1" value="9" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer" />
+                <input type="number" id="q2MantissaInput" step="any" value="9" class="w-24 px-2.5 py-1.5 text-sm font-semibold border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-right math-sci" />
+              </div>
+            </div>
+
+            <!-- Exponent (10^n) Slider + Manual Input -->
+            <div>
+              <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                <label for="q2ExpInput">১০-এর ঘাত (<span class="math-sci">10<sup>n</sup></span> এর <span class="math-sci">n</span>):</label>
+                <span id="q2ExpLabel" class="math-sci text-indigo-600 font-semibold">&times; 10<sup>-6</sup> C</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="q2ExpSlider" min="-15" max="3" step="1" value="-6" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer" />
+                <div class="flex items-center border border-slate-300 rounded-lg px-2 py-1 bg-white">
+                  <span class="text-xs text-slate-500 mr-1 math-sci">10^</span>
+                  <input type="number" id="q2ExpInput" step="1" min="-30" max="30" value="-6" class="w-14 text-sm font-semibold focus:outline-none text-right math-sci" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Unit Quick Buttons -->
+            <div class="pt-1">
+              <span class="block text-[11px] text-slate-500 mb-1.5">দ্রুত একক নির্বাচন (ঘাত পরিবর্তন):</span>
+              <div class="grid grid-cols-5 gap-1.5">
+                <button type="button" data-q="2" data-exp="0" class="q-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition math-sci">C (10<sup>0</sup>)</button>
+                <button type="button" data-q="2" data-exp="-3" class="q-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition math-sci">mC (10<sup>-3</sup>)</button>
+                <button type="button" data-q="2" data-exp="-6" class="q-unit-btn px-2 py-1 text-xs font-medium rounded border border-indigo-500 bg-indigo-50 text-indigo-700 transition math-sci">&mu;C (10<sup>-6</sup>)</button>
+                <button type="button" data-q="2" data-exp="-9" class="q-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition math-sci">nC (10<sup>-9</sup>)</button>
+                <button type="button" data-q="2" data-exp="-12" class="q-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition math-sci">pC (10<sup>-12</sup>)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Distance & Medium Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col justify-between md:col-span-2 lg:col-span-1">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+            <div class="flex items-center gap-2.5">
+              <span class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center shadow-sm math-sci">d</span>
+              <div>
+                <h2 class="font-bold text-slate-800 text-base">মধ্যবর্তী দূরত্ব (<span class="math-sci">d</span>) ও মাধ্যম</h2>
+                <p class="text-xs text-slate-500"><span class="math-sci">q<sub>1</sub></span> ও <span class="math-sci">q<sub>2</sub></span> এর মধ্যকার সরলরৈখিক দূরত্ব</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Scientific Display -->
+          <div class="bg-slate-50 rounded-xl p-3 border border-slate-200/80 mb-4 flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">দূরত্ব (SI এককে):</span>
+            <span id="dLiveDisplay" class="text-base font-bold text-emerald-700 math-sci">2.00 m (2.00 &times; 10<sup>0</sup> m)</span>
+          </div>
+
+          <!-- Distance Mantissa Slider + Input -->
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                <label for="dMantissaInput">দূরত্বের মান (সহগ):</label>
+                <span class="text-slate-500">স্লাইডার বা ম্যানুয়াল ইনপুট</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="dMantissaSlider" min="0.1" max="100" step="0.1" value="2" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer" />
+                <input type="number" id="dMantissaInput" step="any" min="0.0001" value="2" class="w-24 px-2.5 py-1.5 text-sm font-semibold border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-right math-sci" />
+              </div>
+            </div>
+
+            <!-- Distance Exponent Slider + Input -->
+            <div>
+              <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                <label for="dExpInput">দূরত্বের ১০-এর ঘাত (<span class="math-sci">10<sup>n</sup></span> m):</label>
+                <span id="dExpLabel" class="math-sci text-emerald-700 font-semibold">&times; 10<sup>0</sup> m</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="dExpSlider" min="-6" max="3" step="1" value="0" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer" />
+                <div class="flex items-center border border-slate-300 rounded-lg px-2 py-1 bg-white">
+                  <span class="text-xs text-slate-500 mr-1 math-sci">10^</span>
+                  <input type="number" id="dExpInput" step="1" min="-15" max="15" value="0" class="w-14 text-sm font-semibold focus:outline-none text-right math-sci" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Distance Unit Quick Buttons -->
+            <div class="pt-1">
+              <span class="block text-[11px] text-slate-500 mb-1.5">দ্রুত দূরত্বের একক নির্বাচন:</span>
+              <div class="grid grid-cols-4 gap-1.5">
+                <button type="button" data-dexp="0" class="d-unit-btn px-2 py-1 text-xs font-medium rounded border border-emerald-500 bg-emerald-50 text-emerald-800 transition math-sci">m (10<sup>0</sup>)</button>
+                <button type="button" data-dexp="-2" class="d-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-emerald-50 transition math-sci">cm (10<sup>-2</sup>)</button>
+                <button type="button" data-dexp="-3" class="d-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-emerald-50 transition math-sci">mm (10<sup>-3</sup>)</button>
+                <button type="button" data-dexp="-6" class="d-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-emerald-50 transition math-sci">&mu;m (10<sup>-6</sup>)</button>
+              </div>
+            </div>
+
+            <!-- Dielectric Constant K -->
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+              <div>
+                <label for="kMediumInput" class="block text-xs font-medium text-slate-700">মাধ্যমের পরাবৈদ্যুতিক ধ্রুবক (<span class="math-sci">K</span>):</label>
+                <span class="text-[11px] text-slate-500">শূন্যস্থান/বায়ুর জন্য <span class="math-sci">K = 1</span>, কুলম্ব ধ্রুবক <span class="math-sci">9 &times; 10<sup>9</sup> N&middot;m<sup>2</sup>C<sup>-2</sup></span></span>
+              </div>
+              <input type="number" id="kMediumInput" min="1" step="0.1" value="1" class="w-20 px-2.5 py-1.5 text-sm font-semibold border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-right math-sci" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Interactive Connecting Line Visualizer & Live Probe -->
+    <section id="diagramSection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 scroll-mt-14">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <span>সংযোজক সরলরেখা ও তড়িৎ প্রাবল্য ভেক্টর চিত্র</span>
+          </h2>
+          <p class="text-xs text-slate-500">রেখার উপর সবুজ বিন্দু (<span class="math-sci">P<sub>in</sub></span> = মধ্যবর্তী বিন্দু) এবং বেগুনি বিন্দু (<span class="math-sci">P<sub>out</sub></span> = বাইরের বিন্দু) দেখানো হয়েছে</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 text-xs">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200 font-medium">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span> <span class="math-sci">E<sub>1</sub></span> (<span class="math-sci">q<sub>1</sub></span> এর প্রাবল্য)
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200 font-medium">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> <span class="math-sci">E<sub>2</sub></span> (<span class="math-sci">q<sub>2</sub></span> এর প্রাবল্য)
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> মধ্যবর্তী বিন্দু (<span class="math-sci">P<sub>in</sub></span>)
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200 font-medium">
+            <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span> বহিস্থ বিন্দু (<span class="math-sci">P<sub>out</sub></span>)
+          </span>
+        </div>
+      </div>
+
+      <!-- SVG Canvas for Connecting Line -->
+      <div class="w-full bg-slate-900 rounded-xl p-3 sm:p-4 overflow-hidden border border-slate-800">
+        <svg id="lineSvg" viewBox="0 0 900 230" class="w-full h-auto select-none"></svg>
+      </div>
+
+      <!-- Interactive Test Charge Probe Slider -->
+      <div class="mt-4 bg-indigo-50/70 rounded-xl p-4 border border-indigo-100">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-2">
+          <div>
+            <label for="probeSlider" class="text-sm font-bold text-indigo-950 flex items-center gap-1.5">
+              <span>পরীক্ষামূলক একক ধনাত্মক চার্জ (+1 C) স্থানান্তর করে দেখুন:</span>
+            </label>
+            <p class="text-xs text-indigo-700">স্লাইডারটি ডানে-বামে সরিয়ে সংযোজক সরলরেখার যেকোনো অবস্থানে <span class="math-sci">E<sub>1</sub></span>, <span class="math-sci">E<sub>2</sub></span> এবং লব্ধি বল/প্রাবল্য যাচাই করুন</p>
+          </div>
+          <div class="grid grid-cols-1 sm:flex items-center gap-2 w-full md:w-auto">
+            <button type="button" id="snapInternalBtn" class="min-h-[38px] px-3 py-2 sm:py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-sm transition text-center">
+              মধ্যবর্তী সমমান বিন্দুতে নিন (P_in)
+            </button>
+            <button type="button" id="snapExternalBtn" class="min-h-[38px] px-3 py-2 sm:py-1.5 text-xs font-semibold rounded-lg bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white shadow-sm transition text-center">
+              বাইরের সমমান বিন্দুতে নিন (P_out)
+            </button>
+          </div>
+        </div>
+        <input type="range" id="probeSlider" min="-1.5" max="2.5" step="0.005" value="0.4" class="w-full h-2 bg-indigo-200 rounded-lg cursor-pointer my-2" />
+        <div id="probeReadout" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mt-2 text-xs"></div>
+      </div>
+    </section>
+
+    <!-- Quick Comparison Summary Table (Desktop) & Stacked Cards (Mobile) -->
+    <section id="summarySection" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 scroll-mt-14">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800">এক নজরে ৫টি প্রশ্নের সংক্ষিপ্ত উত্তর ও তুলনা</h2>
+          <p class="text-xs text-slate-500">তড়িৎ তীব্রতা ভেক্টর রাশি (<span class="math-sci"><span class="vec">E</span></span>) হওয়ায় "তীব্রতা সমান", "তীব্রতার মান সমান" এবং "তীব্রতা শূন্য" &mdash; এই ৩টির মধ্যে গুরুত্বপূর্ণ ভৌত পার্থক্য নিচে দেখানো হলো</p>
+        </div>
+        <!-- Filter Tabs (Horizontally scrollable on mobile, wrapped on desktop) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 lg:pb-0" id="questionTabs">
+          <button type="button" data-filter="all" class="q-tab-btn whitespace-nowrap min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition">সবগুলো (১-৪)</button>
+          <button type="button" data-filter="q1" class="q-tab-btn whitespace-nowrap min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">প্রশ্ন ১</button>
+          <button type="button" data-filter="q2" class="q-tab-btn whitespace-nowrap min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">প্রশ্ন ২</button>
+          <button type="button" data-filter="q3a" class="q-tab-btn whitespace-nowrap min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">প্রশ্ন ৩ (মান সমান)</button>
+          <button type="button" data-filter="q3b" class="q-tab-btn whitespace-nowrap min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">প্রশ্ন ৩ (তীব্রতা শূন্য)</button>
+          <button type="button" data-filter="q4" class="q-tab-btn whitespace-nowrap min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">প্রশ্ন ৪</button>
+        </div>
+      </div>
+
+      <!-- Mobile-Friendly Stacked Summary Cards (Visible on < md) -->
+      <div id="summaryMobileCards" class="grid grid-cols-1 gap-3 md:hidden"></div>
+
+      <!-- Desktop-Friendly Comparison Table (Visible on >= md) -->
+      <div class="hidden md:block overflow-x-auto rounded-xl border border-slate-200">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 text-xs uppercase">
+              <th class="py-3 px-4 font-bold w-1/4">প্রশ্ন নং ও বিষয়</th>
+              <th class="py-3 px-4 font-bold w-1/4">ভৌত শর্ত (Condition)</th>
+              <th class="py-3 px-4 font-bold w-1/2">বর্তমান চার্জের জন্য অবস্থান / ফলাফল</th>
+            </tr>
+          </thead>
+          <tbody id="summaryTableBody" class="divide-y divide-slate-200 text-slate-700"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Detailed Step-by-Step Solutions for all 5 Questions -->
+    <section id="solutionsContainer" class="space-y-5"></section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 mt-8 py-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+      <span>স্থির তড়িৎ ক্যালকুলেটর &bull; কুলম্বের সূত্র ও তড়িৎ প্রাবল্য বিশ্লেষণ</span>
+      <span class="math-sci">1 / (4&pi;&epsilon;<sub>0</sub>) = 9.00 &times; 10<sup>9</sup> N&middot;m<sup>2</sup>C<sup>-2</sup></span>
+    </div>
+  </footer>
+
+  <script>
+    // State management
+    const state = {
+      q1Sign: 1,
+      q1Mantissa: 4,
+      q1Exp: -6,
+      q2Sign: -1,
+      q2Mantissa: 9,
+      q2Exp: -6,
+      dMantissa: 2,
+      dExp: 0,
+      kMedium: 1,
+      activeFilter: 'all',
+      probeRatio: 0.4 // position x / d
+    };
+
+    const COULOMB_K0 = 9e9; // 9 x 10^9 N m^2 C^-2
+
+    // Format a number in clean HTML scientific notation: e.g. 3.24 &times; 10<sup>-2</sup>
+    function formatSciHTML(value, decimals = 2, showPlus = false) {
+      if (!isFinite(value)) return 'অসীম (&infin;)';
+      if (Math.abs(value) === 0) return '0';
+      const signStr = value < 0 ? '-' : (showPlus ? '+' : '');
+      const absVal = Math.abs(value);
+      const exp = Math.floor(Math.log10(absVal));
+      let mantissa = absVal / Math.pow(10, exp);
+      // Handle rounding overflow like 9.999 -> 10.00
+      if ( Number(mantissa.toFixed(decimals)) >= 10 ) {
+        mantissa /= 10;
+        const adjExp = exp + 1;
+        const expStr = adjExp < 0 ? '-' + Math.abs(adjExp) : String(adjExp);
+        return `<span class="math-sci">${signStr}${mantissa.toFixed(decimals)} &times; 10<sup>${expStr}</sup></span>`;
+      }
+      const expStr = exp < 0 ? '-' + Math.abs(exp) : String(exp);
+      return `<span class="math-sci">${signStr}${mantissa.toFixed(decimals)} &times; 10<sup>${expStr}</sup></span>`;
+    }
+
+    // Format distance or human-friendly + scientific combined
+    function formatDualHTML(value, unit = 'm', decimals = 3) {
+      if (!isFinite(value)) return 'অসীম (&infin;)';
+      if (Math.abs(value) === 0) return `<span class="math-sci">0 ${unit}</span>`;
+      const absVal = Math.abs(value);
+      const signStr = value < 0 ? '-' : '';
+      if (absVal >= 0.01 && absVal < 10000) {
+        return `<span class="math-sci">${signStr}${absVal.toFixed(decimals).replace(/\.?0+$/, '')} ${unit}</span> (${formatSciHTML(value, 2)} <span class="math-sci">${unit}</span>)`;
+      }
+      return `${formatSciHTML(value, 2)} <span class="math-sci">${unit}</span>`;
+    }
+
+    // Format exact user input mantissa x 10^exp
+    function formatUserInputSciHTML(sign, mantissa, exp, unit, showPlus = true) {
+      if (mantissa === 0) return `<span class="math-sci">0 ${unit}</span>`;
+      const signChar = sign < 0 ? '-' : (showPlus ? '+' : '');
+      const expStr = exp < 0 ? '-' + Math.abs(exp) : String(exp);
+      return `<span class="math-sci">${signChar}${Number(mantissa.toFixed(4))} &times; 10<sup>${expStr}</sup> ${unit}</span>`;
+    }
+
+    function getPhysicsValues() {
+      const q1 = state.q1Sign * Math.abs(state.q1Mantissa) * Math.pow(10, state.q1Exp);
+      const q2 = state.q2Sign * Math.abs(state.q2Mantissa) * Math.pow(10, state.q2Exp);
+      const d = Math.max(1e-15, Math.abs(state.dMantissa) * Math.pow(10, state.dExp));
+      const K = Math.max(1, state.kMedium || 1);
+      const kEff = COULOMB_K0 / K;
+
+      const absQ1 = Math.abs(q1);
+      const absQ2 = Math.abs(q2);
+      const sameSign = (q1 * q2) > 0;
+      const oppositeSign = (q1 * q2) < 0;
+      const eitherZero = (absQ1 === 0 || absQ2 === 0);
+      const equalMag = Math.abs(absQ1 - absQ2) <= 1e-12 * Math.max(absQ1, absQ2, 1e-30);
+
+      // 1. Force between q1 and q2
+      const forceMag = kEff * absQ1 * absQ2 / (d * d);
+
+      // 2. Internal point where |E1| = |E2| (between q1 and q2, 0 < x < d)
+      let xInternal = null; // distance from q1
+      let dMinusXInternal = null; // distance from q2
+      let E_internal_single = null;
+      if (!eitherZero) {
+        const r1 = Math.sqrt(absQ1);
+        const r2 = Math.sqrt(absQ2);
+        xInternal = (r1 / (r1 + r2)) * d;
+        dMinusXInternal = (r2 / (r1 + r2)) * d;
+        E_internal_single = kEff * absQ1 / (xInternal * xInternal);
+      }
+
+      // 3. External point where |E1| = |E2| (outside connecting segment, only exists if |q1| != |q2| and neither is 0)
+      let hasExternal = !eitherZero && !equalMag;
+      let xExternalCoord = null; // coordinate on line where q1 is at 0 and q2 is at d
+      let distFromQ1_ext = null;
+      let distFromQ2_ext = null;
+      let smallerChargeName = null;
+      let largerChargeName = null;
+      let E_external_single = null;
+
+      if (hasExternal) {
+        const r1 = Math.sqrt(absQ1);
+        const r2 = Math.sqrt(absQ2);
+        if (absQ1 < absQ2) {
+          // To the left of q1 (x < 0)
+          const xFromQ1 = (r1 / (r2 - r1)) * d;
+          distFromQ1_ext = xFromQ1;
+          distFromQ2_ext = d + xFromQ1;
+          xExternalCoord = -xFromQ1;
+          smallerChargeName = 'q<sub>1</sub>';
+          largerChargeName = 'q<sub>2</sub>';
+        } else {
+          // To the right of q2 (x > d)
+          const xFromQ2 = (r2 / (r1 - r2)) * d;
+          distFromQ2_ext = xFromQ2;
+          distFromQ1_ext = d + xFromQ2;
+          xExternalCoord = d + xFromQ2;
+          smallerChargeName = 'q<sub>2</sub>';
+          largerChargeName = 'q<sub>1</sub>';
+        }
+        E_external_single = kEff * absQ1 / (distFromQ1_ext * distFromQ1_ext);
+      }
+
+      return {
+        q1, q2, d, K, kEff,
+        absQ1, absQ2,
+        sameSign, oppositeSign, eitherZero, equalMag,
+        forceMag,
+        xInternal, dMinusXInternal, E_internal_single,
+        hasExternal, xExternalCoord, distFromQ1_ext, distFromQ2_ext,
+        smallerChargeName, largerChargeName, E_external_single
+      };
+    }
+
+    // Update UI controls to reflect current state
+    function syncInputsUI() {
+      const p = getPhysicsValues();
+
+      // Sign buttons
+      const q1PosBtn = document.getElementById('q1SignPos');
+      const q1NegBtn = document.getElementById('q1SignNeg');
+      const q1Badge = document.getElementById('q1Badge');
+      if (state.q1Sign > 0) {
+        q1PosBtn.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-rose-600 text-white';
+        q1NegBtn.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition text-slate-600 hover:text-slate-900';
+        q1Badge.className = 'w-9 h-9 rounded-xl bg-rose-600 text-white font-bold flex items-center justify-center shadow-sm math-sci';
+      } else {
+        q1PosBtn.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition text-slate-600 hover:text-slate-900';
+        q1NegBtn.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-blue-600 text-white';
+        q1Badge.className = 'w-9 h-9 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center shadow-sm math-sci';
+      }
+
+      const q2PosBtn = document.getElementById('q2SignPos');
+      const q2NegBtn = document.getElementById('q2SignNeg');
+      const q2Badge = document.getElementById('q2Badge');
+      if (state.q2Sign > 0) {
+        q2PosBtn.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-rose-600 text-white';
+        q2NegBtn.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition text-slate-600 hover:text-slate-900';
+        q2Badge.className = 'w-9 h-9 rounded-xl bg-rose-600 text-white font-bold flex items-center justify-center shadow-sm math-sci';
+      } else {
+        q2PosBtn.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition text-slate-600 hover:text-slate-900';
+        q2NegBtn.className = 'px-2.5 py-1 rounded-md text-xs font-bold transition bg-blue-600 text-white';
+        q2Badge.className = 'w-9 h-9 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center shadow-sm math-sci';
+      }
+
+      // Live Displays
+      const q1Live = document.getElementById('q1LiveDisplay');
+      q1Live.innerHTML = `${formatUserInputSciHTML(state.q1Sign, state.q1Mantissa, state.q1Exp, 'C', true)} <span class="text-xs text-slate-400 font-normal">(${formatSciHTML(p.q1, 2, true)} C)</span>`;
+      q1Live.className = `text-sm sm:text-base font-bold math-sci ${state.q1Sign > 0 ? 'text-rose-600' : 'text-blue-600'}`;
+
+      const q2Live = document.getElementById('q2LiveDisplay');
+      q2Live.innerHTML = `${formatUserInputSciHTML(state.q2Sign, state.q2Mantissa, state.q2Exp, 'C', true)} <span class="text-xs text-slate-400 font-normal">(${formatSciHTML(p.q2, 2, true)} C)</span>`;
+      q2Live.className = `text-sm sm:text-base font-bold math-sci ${state.q2Sign > 0 ? 'text-rose-600' : 'text-blue-600'}`;
+
+      const dLive = document.getElementById('dLiveDisplay');
+      dLive.innerHTML = formatDualHTML(p.d, 'm', 3);
+
+      // Exp labels
+      const expStr1 = state.q1Exp < 0 ? '-' + Math.abs(state.q1Exp) : String(state.q1Exp);
+      document.getElementById('q1ExpLabel').innerHTML = `&times; 10<sup>${expStr1}</sup> C`;
+
+      const expStr2 = state.q2Exp < 0 ? '-' + Math.abs(state.q2Exp) : String(state.q2Exp);
+      document.getElementById('q2ExpLabel').innerHTML = `&times; 10<sup>${expStr2}</sup> C`;
+
+      const expStrD = state.dExp < 0 ? '-' + Math.abs(state.dExp) : String(state.dExp);
+      document.getElementById('dExpLabel').innerHTML = `&times; 10<sup>${expStrD}</sup> m`;
+
+      // Highlight active unit buttons
+      document.querySelectorAll('.q-unit-btn').forEach(btn => {
+        const qNum = Number(btn.getAttribute('data-q'));
+        const expVal = Number(btn.getAttribute('data-exp'));
+        const currentExp = qNum === 1 ? state.q1Exp : state.q2Exp;
+        if (currentExp === expVal) {
+          btn.className = 'q-unit-btn px-2 py-1 text-xs font-bold rounded border border-indigo-600 bg-indigo-50 text-indigo-700 transition math-sci';
+        } else {
+          btn.className = 'q-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition math-sci';
+        }
+      });
+
+      document.querySelectorAll('.d-unit-btn').forEach(btn => {
+        const expVal = Number(btn.getAttribute('data-dexp'));
+        if (state.dExp === expVal) {
+          btn.className = 'd-unit-btn px-2 py-1 text-xs font-bold rounded border border-emerald-600 bg-emerald-50 text-emerald-800 transition math-sci';
+        } else {
+          btn.className = 'd-unit-btn px-2 py-1 text-xs font-medium rounded border border-slate-200 bg-slate-50 hover:bg-emerald-50 transition math-sci';
+        }
+      });
+
+      const snapExtBtn = document.getElementById('snapExternalBtn');
+      if (p.hasExternal) {
+        snapExtBtn.disabled = false;
+        snapExtBtn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-purple-600 hover:bg-purple-700 text-white shadow-sm transition';
+      } else {
+        snapExtBtn.disabled = true;
+        snapExtBtn.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-300 text-slate-500 cursor-not-allowed';
+      }
+    }
+
+    // Draw helper arrow on SVG
+    function svgArrow(x1, y1, x2, y2, color, label, labelOffsetY = -8) {
+      const dx = x2 - x1;
+      const dir = dx >= 0 ? 1 : -1;
+      const len = Math.abs(dx);
+      if (len < 4) return '';
+      const headSize = 7;
+      const tipX = x2;
+      const baseX = x2 - dir * headSize;
+      const midX = (x1 + x2) / 2;
+      return `
+        <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="2.5" stroke-linecap="round" />
+        <polygon points="${tipX},${y2} ${baseX},${y2 - 4.5} ${baseX},${y2 + 4.5}" fill="${color}" />
+        <text x="${midX}" y="${y1 + labelOffsetY}" fill="${color}" font-size="11" font-weight="bold" text-anchor="middle">${label}</text>
+      `;
+    }
+
+    // Render SVG connecting line and points (Adaptive for Mobile & Desktop)
+    function renderDiagram() {
+      const p = getPhysicsValues();
+      const svg = document.getElementById('lineSvg');
+      const isMobile = window.innerWidth < 640;
+
+      // Adaptive coordinate system:
+      // Mobile: viewBox 520 x 250 so fonts & circles appear large and crisp on phone screens
+      // Desktop: viewBox 900 x 230 for wide horizontal breathing room
+      const VB_W = isMobile ? 520 : 900;
+      const VB_H = isMobile ? 250 : 230;
+      svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
+
+      const X_Q1 = isMobile ? 165 : 300;
+      const X_Q2 = isMobile ? 355 : 600;
+      const SPAN = X_Q2 - X_Q1;
+      const Y_LINE = isMobile ? 120 : 115;
+      const PAD_EDGE = isMobile ? 36 : 45;
+
+      // Convert physical x / d ratio to SVG x, clamped gracefully if external point is far away
+      function ratioToSvgX(ratio) {
+        const rawX = X_Q1 + ratio * SPAN;
+        return Math.max(PAD_EDGE, Math.min(VB_W - PAD_EDGE, rawX));
+      }
+
+      const q1Color = state.q1Sign > 0 ? '#f43f5e' : '#3b82f6';
+      const q2Color = state.q2Sign > 0 ? '#f43f5e' : '#3b82f6';
+      const q1Sym = state.q1Sign > 0 ? '+' : '-';
+      const q2Sym = state.q2Sign > 0 ? '+' : '-';
+
+      let html = `
+        <!-- Background Grid & Axis Line -->
+        <defs>
+          <pattern id="smallGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+            <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#1e293b" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect width="${VB_W}" height="${VB_H}" fill="url(#smallGrid)" />
+
+        <!-- Extended Connecting Line (Dashed outside, Solid between q1 and q2) -->
+        <line x1="25" y1="${Y_LINE}" x2="${X_Q1}" y2="${Y_LINE}" stroke="#64748b" stroke-width="2" stroke-dasharray="6,6" />
+        <line x1="${X_Q1}" y1="${Y_LINE}" x2="${X_Q2}" y2="${Y_LINE}" stroke="#94a3b8" stroke-width="3.5" />
+        <line x1="${X_Q2}" y1="${Y_LINE}" x2="${VB_W - 20}" y2="${Y_LINE}" stroke="#64748b" stroke-width="2" stroke-dasharray="6,6" />
+
+        <!-- Distance d dimension bracket below -->
+        <line x1="${X_Q1}" y1="185" x2="${X_Q2}" y2="185" stroke="#34d399" stroke-width="1.5" />
+        <line x1="${X_Q1}" y1="178" x2="${X_Q1}" y2="192" stroke="#34d399" stroke-width="2" />
+        <line x1="${X_Q2}" y1="178" x2="${X_Q2}" y2="192" stroke="#34d399" stroke-width="2" />
+        <rect x="${(X_Q1 + X_Q2)/2 - 65}" y="173" width="130" height="22" rx="6" fill="#0f172a" stroke="#34d399" stroke-width="1" />
+        <text x="${(X_Q1 + X_Q2)/2}" y="188" fill="#34d399" font-size="11.5" font-weight="bold" text-anchor="middle">d = ${p.d.toExponential(2)} m</text>
+      `;
+
+      // Internal equal-magnitude point P_in
+      if (!p.eitherZero && p.xInternal !== null) {
+        const inRatio = p.xInternal / p.d;
+        const xSvgIn = ratioToSvgX(inRatio);
+        // Directions of E1 and E2 at internal point:
+        // E1 is from q1 (at left): if q1 > 0, E1 points right (+1); if q1 < 0, E1 points left (-1)
+        const dirE1_in = p.q1 > 0 ? 1 : -1;
+        // E2 is from q2 (at right): if q2 > 0, E2 points left (-1); if q2 < 0, E2 points right (+1)
+        const dirE2_in = p.q2 > 0 ? -1 : 1;
+
+        const pinLabel = p.sameSign ? 'P_in (E = 0 শূন্য বিন্দু)' : 'P_in (E1 = E2 সমান তীব্রতা)';
+        html += `
+          <circle cx="${xSvgIn}" cy="${Y_LINE}" r="7" fill="#10b981" stroke="#ffffff" stroke-width="2" />
+          <text x="${xSvgIn}" y="${Y_LINE + 25}" fill="#34d399" font-size="11" font-weight="bold" text-anchor="middle">${pinLabel}</text>
+          <text x="${xSvgIn}" y="${Y_LINE + 39}" fill="#94a3b8" font-size="10" text-anchor="middle">x = ${p.xInternal.toExponential(2)} m</text>
+          ${svgArrow(xSvgIn, Y_LINE - 18, xSvgIn + dirE1_in * 42, Y_LINE - 18, '#fb7185', 'E1', -6)}
+          ${svgArrow(xSvgIn, Y_LINE - 38, xSvgIn + dirE2_in * 42, Y_LINE - 38, '#60a5fa', 'E2', -6)}
+        `;
+      }
+
+      // External equal-magnitude point P_out
+      if (p.hasExternal && p.xExternalCoord !== null) {
+        const extRatio = p.xExternalCoord / p.d;
+        const xSvgExt = ratioToSvgX(extRatio);
+        const isClamped = (X_Q1 + extRatio * SPAN) < PAD_EDGE || (X_Q1 + extRatio * SPAN) > (VB_W - PAD_EDGE);
+        const sideSign = extRatio < 0 ? -1 : 1;
+        const dirE1_ext = (p.q1 > 0 ? 1 : -1) * sideSign;
+        const dirE2_ext = (p.q2 > 0 ? 1 : -1) * sideSign;
+
+        const poutLabel = p.oppositeSign ? 'P_out (E = 0 শূন্য বিন্দু)' : 'P_out (E1 = E2 সমান তীব্রতা)';
+        const distNote = p.absQ1 < p.absQ2
+          ? `q1 হতে ${p.distFromQ1_ext.toExponential(2)} m বামে`
+          : `q2 হতে ${p.distFromQ2_ext.toExponential(2)} m ডানে`;
+
+        html += `
+          <circle cx="${xSvgExt}" cy="${Y_LINE}" r="7" fill="#a855f7" stroke="#ffffff" stroke-width="2" />
+          <text x="${xSvgExt}" y="${Y_LINE + 25}" fill="#c084fc" font-size="11" font-weight="bold" text-anchor="middle">${poutLabel}${isClamped ? ' (প্রান্তে সংকুচিত)' : ''}</text>
+          <text x="${xSvgExt}" y="${Y_LINE + 39}" fill="#94a3b8" font-size="10" text-anchor="middle">${distNote}</text>
+          ${svgArrow(xSvgExt, Y_LINE - 18, xSvgExt + dirE1_ext * 42, Y_LINE - 18, '#fb7185', 'E1', -6)}
+          ${svgArrow(xSvgExt, Y_LINE - 38, xSvgExt + dirE2_ext * 42, Y_LINE - 38, '#60a5fa', 'E2', -6)}
+        `;
+      }
+
+      // Probe marker
+      const probeSvgX = ratioToSvgX(state.probeRatio);
+      html += `
+        <line x1="${probeSvgX}" y1="18" x2="${probeSvgX}" y2="${Y_LINE - 8}" stroke="#facc15" stroke-width="1.5" stroke-dasharray="3,3" />
+        <circle cx="${probeSvgX}" cy="${Y_LINE}" r="5" fill="#facc15" stroke="#0f172a" stroke-width="1.5" />
+        <rect x="${probeSvgX - 38}" y="6" width="76" height="18" rx="4" fill="#facc15" />
+        <text x="${probeSvgX}" y="18" fill="#0f172a" font-size="10" font-weight="bold" text-anchor="middle">পরীক্ষা চার্জ +1C</text>
+      `;
+
+      // Charge 1 Circle & Label
+      html += `
+        <circle cx="${X_Q1}" cy="${Y_LINE}" r="20" fill="${q1Color}" stroke="#ffffff" stroke-width="2.5" />
+        <text x="${X_Q1}" y="${Y_LINE + 5}" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">q1(${q1Sym})</text>
+        <text x="${X_Q1}" y="${Y_LINE + 56}" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">x = 0</text>
+      `;
+
+      // Charge 2 Circle & Label
+      html += `
+        <circle cx="${X_Q2}" cy="${Y_LINE}" r="20" fill="${q2Color}" stroke="#ffffff" stroke-width="2.5" />
+        <text x="${X_Q2}" y="${Y_LINE + 5}" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">q2(${q2Sym})</text>
+        <text x="${X_Q2}" y="${Y_LINE + 56}" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">x = d</text>
+      `;
+
+      svg.innerHTML = html;
+
+      // Update probe readout
+      const xProbe = state.probeRatio * p.d;
+      const r1Probe = Math.abs(xProbe);
+      const r2Probe = Math.abs(xProbe - p.d);
+      const minSafe = 1e-9 * p.d;
+
+      let e1Mag = r1Probe > minSafe ? (p.kEff * p.absQ1 / (r1Probe * r1Probe)) : Infinity;
+      let e2Mag = r2Probe > minSafe ? (p.kEff * p.absQ2 / (r2Probe * r2Probe)) : Infinity;
+
+      // Signed vector components along +x axis (rightward is +)
+      let dir1 = xProbe >= 0 ? (p.q1 >= 0 ? 1 : -1) : (p.q1 >= 0 ? -1 : 1);
+      if (p.absQ1 === 0) dir1 = 0;
+      let dir2 = (xProbe - p.d) >= 0 ? (p.q2 >= 0 ? 1 : -1) : (p.q2 >= 0 ? -1 : 1);
+      if (p.absQ2 === 0) dir2 = 0;
+
+      const e1Vec = dir1 * e1Mag;
+      const e2Vec = dir2 * e2Mag;
+      const eNetVec = e1Vec + e2Vec;
+      const eNetMag = Math.abs(eNetVec);
+
+      const dirText = (v) => {
+        if (!isFinite(v)) return 'চার্জের ঠিক উপরে (অসংজ্ঞায়িত)';
+        if (Math.abs(v) < 1e-7 * Math.max(e1Mag, e2Mag, 1e-20)) return 'শূন্য (কোনো দিক নেই)';
+        return v > 0 ? 'ডান দিকে (+x অভিমুখে)' : 'বাম দিকে (-x অভিমুখে)';
+      };
+
+      document.getElementById('probeReadout').innerHTML = `
+        <div class="bg-white p-2.5 rounded-lg border border-indigo-100">
+          <div class="text-slate-500">অবস্থান (<span class="math-sci">q<sub>1</sub></span> হতে দূরত্ব <span class="math-sci">x</span>):</div>
+          <div class="font-bold text-slate-800 mt-0.5">${formatDualHTML(xProbe, 'm', 3)}</div>
+          <div class="text-[11px] text-indigo-600 mt-0.5">${xProbe < 0 ? 'q<sub>1</sub> এর বামে (বাইরে)' : (xProbe > p.d ? 'q<sub>2</sub> এর ডানে (বাইরে)' : 'দুই চার্জের মধ্যবর্তী স্থানে')}</div>
+        </div>
+        <div class="bg-white p-2.5 rounded-lg border border-indigo-100">
+          <div class="text-slate-500"><span class="math-sci">q<sub>1</sub></span> এর জন্য প্রাবল্য (<span class="math-sci"><span class="vec">E</span><sub>1</sub></span>):</div>
+          <div class="font-bold text-rose-600 mt-0.5">${formatSciHTML(e1Mag, 2)} <span class="math-sci">N&middot;C<sup>-1</sup></span></div>
+          <div class="text-[11px] text-slate-600 mt-0.5">দিক: ${dirText(e1Vec)}</div>
+        </div>
+        <div class="bg-white p-2.5 rounded-lg border border-indigo-100">
+          <div class="text-slate-500"><span class="math-sci">q<sub>2</sub></span> এর জন্য প্রাবল্য (<span class="math-sci"><span class="vec">E</span><sub>2</sub></span>):</div>
+          <div class="font-bold text-blue-600 mt-0.5">${formatSciHTML(e2Mag, 2)} <span class="math-sci">N&middot;C<sup>-1</sup></span></div>
+          <div class="text-[11px] text-slate-600 mt-0.5">দিক: ${dirText(e2Vec)}</div>
+        </div>
+        <div class="bg-white p-2.5 rounded-lg border border-indigo-100">
+          <div class="text-slate-500">লব্ধি প্রাবল্য / +1 C চার্জে বল (<span class="math-sci"><span class="vec">E</span><sub>net</sub></span>):</div>
+          <div class="font-bold text-emerald-700 mt-0.5">${formatSciHTML(eNetMag, 2)} <span class="math-sci">N&middot;C<sup>-1</sup> (বা N)</span></div>
+          <div class="text-[11px] text-slate-600 mt-0.5">দিক: ${dirText(eNetVec)}</div>
+        </div>
+      `;
+    }
+
+    // Render Summary Table and Detailed Solutions for all 5 Questions
+    function renderSolutions() {
+      const p = getPhysicsValues();
+      const r1 = Math.sqrt(p.absQ1);
+      const r2 = Math.sqrt(p.absQ2);
+
+      // Prepare summary strings for each question
+      const forceTypeBn = p.eitherZero
+        ? 'কোনো বল ক্রিয়া করবে না (বল শূন্য)'
+        : (p.oppositeSign ? 'আকর্ষণ বল (Attractive Force)' : 'বিকর্ষণ বল (Repulsive Force)');
+
+      // Question 2 summary: Where E1_vec = E2_vec (Both magnitude AND direction equal)
+      let q2SummaryHtml = '';
+      if (p.eitherZero) {
+        q2SummaryHtml = 'একটি চার্জ শূন্য হওয়ায় কোথাও দুইটি অশূন্য সমান প্রাবল্য পাওয়া যাবে না।';
+      } else if (p.oppositeSign) {
+        q2SummaryHtml = `<span class="font-semibold text-emerald-700">দুই চার্জের মধ্যবর্তী স্থানে:</span> <span class="math-sci">q<sub>1</sub></span> থেকে ${formatDualHTML(p.xInternal, 'm', 3)} এবং <span class="math-sci">q<sub>2</sub></span> থেকে ${formatDualHTML(p.dMinusXInternal, 'm', 3)} দূরত্বে (<span class="math-sci"><span class="vec">E</span><sub>1</sub></span> ও <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> এর মান ও দিক উভয়ই সমান)।`;
+      } else {
+        // Same sign charges: E1 and E2 have the SAME direction OUTSIDE the segment
+        if (p.equalMag) {
+          q2SummaryHtml = `<span class="font-semibold text-amber-700">সমমানের সমধর্মী চার্জ (<span class="math-sci">|q<sub>1</sub>| = |q<sub>2</sub>|</span>):</span> মধ্যবিন্দুতে (<span class="math-sci">x = ${formatDualHTML(p.xInternal, 'm', 3)}</span>) মান সমান হলেও দিক বিপরীত; আর বাইরে দিক একই হলেও সসীম দূরত্বে মান সমান হয় না।`;
+        } else {
+          q2SummaryHtml = `<span class="font-semibold text-purple-700">দুই চার্জের বাইরে (${p.smallerChargeName} এর পাশে):</span> ছোট চার্জ <span class="math-sci">${p.smallerChargeName}</span> থেকে ${formatDualHTML(p.absQ1 < p.absQ2 ? p.distFromQ1_ext : p.distFromQ2_ext, 'm', 3)} বাইরে (<span class="math-sci"><span class="vec">E</span><sub>1</sub></span> ও <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> এর মান ও দিক উভয়ই সমান)।`;
+        }
+      }
+
+      // Question 3a summary: Where |E1| = |E2| (Magnitudes equal, regardless of direction)
+      let q3aSummaryHtml = '';
+      if (p.eitherZero) {
+        q3aSummaryHtml = 'একটি চার্জ শূন্য হওয়ায় সসীম দূরত্বে তীব্রতার মান সমান হবে না।';
+      } else if (p.equalMag) {
+        q3aSummaryHtml = `<span class="font-semibold text-emerald-700">১টি বিন্দু (ঠিক মধ্যবিন্দুতে):</span> উভয় চার্জ থেকে ${formatDualHTML(p.xInternal, 'm', 3)} দূরত্বে <span class="math-sci">|<span class="vec">E</span><sub>1</sub>| = |<span class="vec">E</span><sub>2</sub>| = ${formatSciHTML(p.E_internal_single, 2)} N&middot;C<sup>-1</sup></span>।`;
+      } else {
+        q3aSummaryHtml = `
+          <div><span class="font-semibold text-emerald-700">১) অন্তঃস্থ বিন্দু (মাঝে):</span> <span class="math-sci">q<sub>1</sub></span> হতে ${formatDualHTML(p.xInternal, 'm', 3)} দূরে।</div>
+          <div class="mt-1"><span class="font-semibold text-purple-700">২) বহিস্থ বিন্দু (বাইরে):</span> ছোট চার্জ <span class="math-sci">${p.smallerChargeName}</span> হতে ${formatDualHTML(p.absQ1 < p.absQ2 ? p.distFromQ1_ext : p.distFromQ2_ext, 'm', 3)} বাইরে।</div>
+        `;
+      }
+
+      // Question 3b & Question 4 summary: Where net E = 0 / unit +ve charge feels no force
+      let q3bSummaryHtml = '';
+      if (p.eitherZero) {
+        q3bSummaryHtml = 'একটি চার্জ শূন্য হওয়ায় সসীম দূরত্বে লব্ধি তড়িৎ তীব্রতা শূন্য হবে না।';
+      } else if (p.sameSign) {
+        q3bSummaryHtml = `<span class="font-semibold text-emerald-700">দুই চার্জের মধ্যবর্তী স্থানে:</span> <span class="math-sci">q<sub>1</sub></span> থেকে ${formatDualHTML(p.xInternal, 'm', 3)} এবং <span class="math-sci">q<sub>2</sub></span> থেকে ${formatDualHTML(p.dMinusXInternal, 'm', 3)} দূরত্বে লব্ধি প্রাবল্য শূন্য (<span class="math-sci"><span class="vec">E</span><sub>net</sub> = 0</span>)।`;
+      } else {
+        // Opposite sign
+        if (p.equalMag) {
+          q3bSummaryHtml = `<span class="font-semibold text-rose-700">কোথাও শূন্য হবে না (তড়িৎ দ্বিমেরু):</span> চার্জদ্বয় সমমানের ও বিপরীতধর্মী (<span class="math-sci">|q<sub>1</sub>| = |q<sub>2</sub>|</span>) হওয়ায় সংযোজক রেখার কোনো সসীম বিন্দুতেই তড়িৎ তীব্রতা শূন্য হবে না।`;
+        } else {
+          q3bSummaryHtml = `<span class="font-semibold text-purple-700">দুই চার্জের বাইরে (${p.smallerChargeName} এর পাশে):</span> ছোট মানের চার্জ <span class="math-sci">${p.smallerChargeName}</span> থেকে ${formatDualHTML(p.absQ1 < p.absQ2 ? p.distFromQ1_ext : p.distFromQ2_ext, 'm', 3)} এবং বড় চার্জ <span class="math-sci">${p.largerChargeName}</span> থেকে ${formatDualHTML(p.absQ1 < p.absQ2 ? p.distFromQ2_ext : p.distFromQ1_ext, 'm', 3)} দূরত্বে।`;
+        }
+      }
+
+      // Populate Mobile Summary Cards (< md)
+      document.getElementById('summaryMobileCards').innerHTML = `
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-bold text-slate-900 text-sm">১। মধ্যবর্তী আকর্ষণ / বিকর্ষণ বল</span>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-semibold math-sci">F = k|q<sub>1</sub>q<sub>2</sub>|/d<sup>2</sup></span>
+          </div>
+          <div class="text-xs text-slate-700"><span class="font-bold text-indigo-700">${formatSciHTML(p.forceMag, 3)} <span class="math-sci">N</span></span> &mdash; <span class="font-medium ${p.oppositeSign ? 'text-emerald-700' : 'text-rose-700'}">${forceTypeBn}</span></div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-bold text-slate-900 text-sm">২। কোথায় তড়িৎ তীব্রতা সমান (<span class="math-sci"><span class="vec">E</span><sub>1</sub> = <span class="vec">E</span><sub>2</sub></span>)</span>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">মান ও দিক একই</span>
+          </div>
+          <div class="text-xs text-slate-700">${q2SummaryHtml}</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-bold text-slate-900 text-sm">৩(ক)। কোথায় তীব্রতার মান সমান (<span class="math-sci">|<span class="vec">E</span><sub>1</sub>| = |<span class="vec">E</span><sub>2</sub>|</span>)</span>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold">কেবল মান সমান</span>
+          </div>
+          <div class="text-xs text-slate-700">${q3aSummaryHtml}</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-bold text-slate-900 text-sm">৩(খ)। কোথায় তড়িৎ তীব্রতা শূন্য (<span class="math-sci"><span class="vec">E</span><sub>net</sub> = 0</span>)</span>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-semibold">মান সমান, দিক বিপরীত</span>
+          </div>
+          <div class="text-xs text-slate-700">${q3bSummaryHtml}</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-bold text-slate-900 text-sm">৪। কোথায় +1 C চার্জ বল অনুভব করবে না</span>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-semibold math-sci"><span class="vec">F</span> = (+1C)<span class="vec">E</span> = 0</span>
+          </div>
+          <div class="text-xs text-slate-700">${q3bSummaryHtml}</div>
+        </div>
+      `;
+
+      // Populate Summary Table (>= md)
+      document.getElementById('summaryTableBody').innerHTML = `
+        <tr class="hover:bg-slate-50">
+          <td class="py-3 px-4 font-semibold text-slate-900">১। মধ্যবর্তী আকর্ষণ / বিকর্ষণ বল</td>
+          <td class="py-3 px-4 math-sci">F = (1 / 4&pi;&epsilon;<sub>0</sub>K) &middot; |q<sub>1</sub>q<sub>2</sub>| / d<sup>2</sup></td>
+          <td class="py-3 px-4"><span class="font-bold text-indigo-700">${formatSciHTML(p.forceMag, 3)} <span class="math-sci">N</span></span> &mdash; <span class=" font-medium ${p.oppositeSign ? 'text-emerald-700' : 'text-rose-700'}">${forceTypeBn}</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3 px-4 font-semibold text-slate-900">২। কোথায় তড়িৎ তীব্রতা সমান (<span class="math-sci"><span class="vec">E</span><sub>1</sub> = <span class="vec">E</span><sub>2</sub></span>)</td>
+          <td class="py-3 px-4">মান সমান (<span class="math-sci">E<sub>1</sub> = E<sub>2</sub></span>) <strong>এবং</strong> দিকও একই</td>
+          <td class="py-3 px-4">${q2SummaryHtml}</td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3 px-4 font-semibold text-slate-900">৩(ক)। কোথায় তড়িৎ তীব্রতার মান সমান (<span class="math-sci">|<span class="vec">E</span><sub>1</sub>| = |<span class="vec">E</span><sub>2</sub>|</span>)</td>
+          <td class="py-3 px-4">কেবল মান সমান (<span class="math-sci">E<sub>1</sub> = E<sub>2</sub></span>), দিক একই বা বিপরীত উভয়ই হতে পারে</td>
+          <td class="py-3 px-4">${q3aSummaryHtml}</td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3 px-4 font-semibold text-slate-900">৩(খ)। কোথায় তড়িৎ তীব্রতা শূন্য (<span class="math-sci"><span class="vec">E</span><sub>net</sub> = 0</span>)</td>
+          <td class="py-3 px-4">মান সমান (<span class="math-sci">E<sub>1</sub> = E<sub>2</sub></span>) <strong>এবং</strong> দিক পরস্পর বিপরীত</td>
+          <td class="py-3 px-4">${q3bSummaryHtml}</td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3 px-4 font-semibold text-slate-900">৪। কোথায় +1 C চার্জ কোনো বল অনুভব করবে না (<span class="math-sci"><span class="vec">F</span><sub>net</sub> = 0</span>)</td>
+          <td class="py-3 px-4"><span class="math-sci"><span class="vec">F</span> = (+1 C) &times; <span class="vec">E</span><sub>net</sub> = 0</span> (অর্থাৎ লব্ধি তীব্রতা শূন্য বিন্দু)</td>
+          <td class="py-3 px-4">${q3bSummaryHtml}</td>
+        </tr>
+      `;
+
+      // Build Detailed Step-by-Step Solution Cards
+      const cards = [];
+
+      // CARD 1: মধ্যবর্তী আকর্ষণ বা বিকর্ষণ বল নির্ণয়
+      cards.push({
+        id: 'q1',
+        html: `
+          <article class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-indigo-50 to-slate-50 px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold text-sm">প্রশ্ন ১</span>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">চার্জদ্বয়ের মধ্যবর্তী আকর্ষণ বা বিকর্ষণ বল নির্ণয়</h3>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold ${p.oppositeSign ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'}">
+                ${forceTypeBn}
+              </span>
+            </div>
+            <div class="p-5 space-y-4 text-sm leading-relaxed text-slate-700">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                  <div class="font-bold text-slate-800 mb-2">প্রদত্ত উপাত্ত (SI এককে বৈজ্ঞানিক আকারে):</div>
+                  <ul class="space-y-1.5 text-xs sm:text-sm">
+                    <li>&bull; ১ম চার্জ, <span class="math-sci">q<sub>1</sub></span> = ${formatSciHTML(p.q1, 3, true)} <span class="math-sci">C</span> (মান <span class="math-sci">|q<sub>1</sub>|</span> = ${formatSciHTML(p.absQ1, 3)} <span class="math-sci">C</span>)</li>
+                    <li>&bull; ২য় চার্জ, <span class="math-sci">q<sub>2</sub></span> = ${formatSciHTML(p.q2, 3, true)} <span class="math-sci">C</span> (মান <span class="math-sci">|q<sub>2</sub>|</span> = ${formatSciHTML(p.absQ2, 3)} <span class="math-sci">C</span>)</li>
+                    <li>&bull; মধ্যবর্তী দূরত্ব, <span class="math-sci">d</span> = ${formatDualHTML(p.d, 'm', 4)}</li>
+                    <li>&bull; কুলম্বের ধ্রুবক, <span class="math-sci">1 / (4&pi;&epsilon;<sub>0</sub>K)</span> = ${formatSciHTML(p.kEff, 2)} <span class="math-sci">N&middot;m<sup>2</sup>C<sup>-2</sup></span></li>
+                  </ul>
+                </div>
+                <div class="formula-box rounded-xl p-4">
+                  <div class="font-bold text-indigo-950 mb-2">কুলম্বের সূত্রানুসারে:</div>
+                  <div class="text-base font-semibold text-slate-900 my-2 math-sci">
+                    F = <span class="fraction"><span class="num">1</span><span class="den">4&pi;&epsilon;<sub>0</sub>K</span></span> &times; <span class="fraction"><span class="num">|q<sub>1</sub> &times; q<sub>2</sub>|</span><span class="den">d<sup>2</sup></span></span>
+                  </div>
+                  <p class="text-xs text-slate-600 mt-2">
+                    ${p.oppositeSign
+                      ? 'যেহেতু একটি চার্জ ধনাত্মক (+) এবং অপরটি ঋণাত্মক (-), তাই এদের মধ্যকার ক্রিয়াশীল বলটি হলো <strong>আকর্ষণ বল</strong>।'
+                      : 'যেহেতু উভয় চার্জই সমধর্মী (' + (p.q1 > 0 ? 'উভয়ই ধনাত্মক +' : 'উভয়ই ঋণাত্মক -') + '), তাই এদের মধ্যকার ক্রিয়াশীল বলটি হলো <strong>বিকর্ষণ বল</strong> (প্রশ্নে আকর্ষণ বল চাওয়া হলেও সমধর্মী চার্জের ক্ষেত্রে এটি প্রকৃতপক্ষে বিকর্ষণ বল)।'}
+                  </p>
+                </div>
+              </div>
+
+              <div class="bg-indigo-50/50 rounded-xl p-4 border border-indigo-100 space-y-2">
+                <div class="font-bold text-indigo-950">গাণিতিক হিসাব (ধাপে ধাপে):</div>
+                <div class="math-eq text-xs sm:text-sm py-1">
+                  বা, F = (${formatSciHTML(p.kEff, 2)} N&middot;m<sup>2</sup>C<sup>-2</sup>) &times; <span class="fraction"><span class="num">(${formatSciHTML(p.absQ1, 2)} C) &times; (${formatSciHTML(p.absQ2, 2)} C)</span><span class="den">(${formatSciHTML(p.d, 2)} m)<sup>2</sup></span></span>
+                </div>
+                <div class="math-eq text-xs sm:text-sm py-1">
+                  বা, F = (${formatSciHTML(p.kEff, 2)}) &times; <span class="fraction"><span class="num">${formatSciHTML(p.absQ1 * p.absQ2, 3)} C<sup>2</sup></span><span class="den">${formatSciHTML(p.d * p.d, 3)} m<sup>2</sup></span></span>
+                </div>
+                <div class="pt-2 border-t border-indigo-200/60 flex flex-wrap items-center justify-between gap-2">
+                  <span class="font-bold text-slate-900 text-base">নির্ণেয় বল, <span class="math-sci">F</span> = <span class="text-indigo-700">${formatSciHTML(p.forceMag, 3)} <span class="math-sci">N</span></span> (${p.forceMag.toFixed(4)} N)</span>
+                  <span class="text-xs font-semibold text-indigo-800 bg-indigo-100 px-2.5 py-1 rounded-md">প্রকৃতি: ${forceTypeBn}</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        `
+      });
+
+      // CARD 2: সংযোজক সরলরেখা বরাবর কোথায় তড়িৎ তীব্রতা সমান (E1_vec = E2_vec)
+      let card2Body = '';
+      if (p.eitherZero) {
+        card2Body = `<p class="text-amber-700 font-medium">যেহেতু একটি চার্জের মান শূন্য, তাই সসীম দূরত্বে দুইটি চার্জের জন্য সমান ও অশূন্য তড়িৎ তীব্রতা পাওয়া যাবে না।</p>`;
+      } else if (p.oppositeSign) {
+        card2Body = `
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-slate-800 space-y-2">
+            <div class="font-bold text-emerald-900">ভেক্টর বিশ্লেষণ (কেন দুই চার্জের মাঝে তড়িৎ তীব্রতা সমান হবে?):</div>
+            <p class="text-xs sm:text-sm">
+              <strong>তড়িৎ তীব্রতা (<span class="math-sci"><span class="vec">E</span></span>) একটি ভেক্টর রাশি।</strong> দুটি ভেক্টর সমান (<span class="math-sci"><span class="vec">E</span><sub>1</sub> = <span class="vec">E</span><sub>2</sub></span>) হওয়ার শর্ত হলো তাদের <strong>মান সমান (<span class="math-sci">|<span class="vec">E</span><sub>1</sub>| = |<span class="vec">E</span><sub>2</sub>|</span>)</strong> হতে হবে এবং <strong>দিকও একই (Same Direction)</strong> হতে হবে।
+              এখানে <span class="math-sci">q<sub>1</sub></span> এবং <span class="math-sci">q<sub>2</sub></span> বিপরীতধর্মী চার্জ হওয়ায়, এদের <strong>মধ্যবর্তী সংযোজক রেখার যেকোনো বিন্দুতে</strong> স্থাপিত <span class="math-sci">+1 C</span> ধনাত্মক চার্জকে ধনাত্মক চার্জটি বিকর্ষণ করে এবং ঋণাত্মক চার্জটি একই দিকে আকর্ষণ করে। ফলে মধ্যবর্তী স্থানে <span class="math-sci"><span class="vec">E</span><sub>1</sub></span> ও <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> <strong>একই দিকে</strong> ক্রিয়া করে!
+            </p>
+          </div>
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2">
+            <div class="font-bold text-slate-900">গাণিতিক সমাধান:</div>
+            <p>ধরি, চার্জদ্বয়ের মধ্যবর্তী স্থানে <span class="math-sci">q<sub>1</sub></span> চার্জ থেকে <span class="math-sci">x</span> দূরত্বে (অর্থাৎ <span class="math-sci">q<sub>2</sub></span> চার্জ থেকে <span class="math-sci">d - x</span> দূরত্বে) <span class="math-sci">P<sub>in</sub></span> বিন্দুতে তড়িৎ তীব্রতা সমান (<span class="math-sci"><span class="vec">E</span><sub>1</sub> = <span class="vec">E</span><sub>2</sub></span>)।</p>
+            <div class="math-eq text-xs sm:text-sm py-1">
+              শর্তমতে, E<sub>1</sub> = E<sub>2</sub> &nbsp;<span class="font-bold text-indigo-700">&rArr;</span>&nbsp;
+              <span class="fraction"><span class="num">1</span><span class="den">4&pi;&epsilon;<sub>0</sub>K</span></span> &middot; <span class="fraction"><span class="num">|q<sub>1</sub>|</span><span class="den">x<sup>2</sup></span></span> =
+              <span class="fraction"><span class="num">1</span><span class="den">4&pi;&epsilon;<sub>0</sub>K</span></span> &middot; <span class="fraction"><span class="num">|q<sub>2</sub>|</span><span class="den">(d - x)<sup>2</sup></span></span>
+            </div>
+            <div class="math-eq text-xs sm:text-sm py-1">
+              বা, <span class="fraction"><span class="num">${formatSciHTML(p.absQ1, 2)}</span><span class="den">x<sup>2</sup></span></span> = <span class="fraction"><span class="num">${formatSciHTML(p.absQ2, 2)}</span><span class="den">(${formatSciHTML(p.d, 2)} - x)<sup>2</sup></span></span>
+              &nbsp;<span class="font-bold text-indigo-700">&rArr;</span>&nbsp; (বর্গমূল করে) &nbsp;
+              <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span></span><span class="den">x</span></span> = <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>2</sub>|</span></span></span><span class="den">d - x</span></span>
+            </div>
+            <div class="math-eq text-xs sm:text-sm py-1">
+              বা, x = <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span></span><span class="den"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span> + <span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>2</sub>|</span></span></span></span> &times; d
+              = <span class="fraction"><span class="num">${formatSciHTML(r1, 3)}</span><span class="den">${formatSciHTML(r1, 3)} + ${formatSciHTML(r2, 3)}</span></span> &times; (${formatSciHTML(p.d, 2)} m)
+            </div>
+            <div class="pt-2 border-t border-slate-200 text-slate-900 font-bold text-sm sm:text-base">
+              সুতরাং, নির্ণেয় অবস্থান: চার্জদ্বয়ের <strong>মধ্যবর্তী স্থানে</strong> <span class="math-sci">q<sub>1</sub></span> হতে <span class="text-emerald-700">${formatDualHTML(p.xInternal, 'm', 3)}</span> এবং <span class="math-sci">q<sub>2</sub></span> হতে <span class="text-emerald-700">${formatDualHTML(p.dMinusXInternal, 'm', 3)}</span> দূরত্বে তড়িৎ তীব্রতা (<span class="math-sci"><span class="vec">E</span><sub>1</sub></span> ও <span class="math-sci"><span class="vec">E</span><sub>2</sub></span>) সমান।
+              <div class="text-xs font-normal text-slate-600 mt-1">
+                (উক্ত বিন্দুতে প্রতিটি চার্জের তীব্রতা <span class="math-sci">E<sub>1</sub> = E<sub>2</sub> = ${formatSciHTML(p.E_internal_single, 2)} N&middot;C<sup>-1</sup></span> এবং উভয়ই একই দিকে ক্রিয়াশীল হওয়ায় লব্ধি প্রাবল্য <span class="math-sci">E<sub>net</sub> = 2E<sub>1</sub> = ${formatSciHTML(2 * p.E_internal_single, 2)} N&middot;C<sup>-1</sup></span>)
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        // Same sign charges for Question 2
+        if (p.equalMag) {
+          card2Body = `
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-slate-800 space-y-2">
+              <div class="font-bold text-amber-900">ভেক্টর বিশ্লেষণ (সমমানের সমধর্মী চার্জের বিশেষ ক্ষেত্র):</div>
+              <p class="text-xs sm:text-sm">
+                <strong>তড়িৎ তীব্রতা (<span class="math-sci"><span class="vec">E</span></span>) ভেক্টর রাশি</strong> হওয়ায় <span class="math-sci"><span class="vec">E</span><sub>1</sub> = <span class="vec">E</span><sub>2</sub></span> হতে হলে মান ও দিক উভয়ই সমান হতে হয়:
+              </p>
+              <ul class="list-disc list-inside text-xs sm:text-sm space-y-1">
+                <li><strong>বাইরের অঞ্চলে (সংযোজক রেখার বর্ধিতাংশে):</strong> সমধর্মী চার্জ হওয়ায় <span class="math-sci"><span class="vec">E</span><sub>1</sub></span> ও <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> একই দিকে ক্রিয়া করে, কিন্তু <span class="math-sci">|q<sub>1</sub>| = |q<sub>2</sub>|</span> হওয়ায় সসীম দূরত্বে কখনোই <span class="math-sci">|<span class="vec">E</span><sub>1</sub>| = |<span class="vec">E</span><sub>2</sub>|</span> সম্ভব নয়।</li>
+                <li><strong>মধ্যবিন্দুতে (<span class="math-sci">x = d/2 = ${formatDualHTML(p.xInternal, 'm', 3)}</span>):</strong> এখানে তীব্রতার <strong>মান সমান</strong> (<span class="math-sci">|<span class="vec">E</span><sub>1</sub>| = |<span class="vec">E</span><sub>2</sub>| = ${formatSciHTML(p.E_internal_single, 2)} N&middot;C<sup>-1</sup></span>), কিন্তু দিক পরস্পর বিপরীত (<span class="math-sci"><span class="vec">E</span><sub>1</sub> = -<span class="vec">E</span><sub>2</sub></span>)।</li>
+              </ul>
+            </div>
+          `;
+        } else {
+          const xExtSmall = p.absQ1 < p.absQ2 ? p.distFromQ1_ext : p.distFromQ2_ext;
+          const xExtLarge = p.absQ1 < p.absQ2 ? p.distFromQ2_ext : p.distFromQ1_ext;
+          card2Body = `
+            <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 text-slate-800 space-y-2">
+              <div class="font-bold text-purple-900">ভেক্টর বিশ্লেষণ (সমধর্মী চার্জের ক্ষেত্রে দিক ও মান কখন একই হয়?):</div>
+              <p class="text-xs sm:text-sm">
+                <strong>তড়িৎ তীব্রতা (<span class="math-sci"><span class="vec">E</span></span>) একটি ভেক্টর রাশি।</strong> যেহেতু <span class="math-sci">q<sub>1</sub></span> ও <span class="math-sci">q<sub>2</sub></span> <strong>সমধর্মী চার্জ</strong>, তাই এদের মধ্যবর্তী স্থানে <span class="math-sci"><span class="vec">E</span><sub>1</sub></span> ও <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> পরস্পর বিপরীত দিকে ক্রিয়া করে (সেখানে মান সমান হলে লব্ধি শূন্য হয়, যা প্রশ্ন ৩(খ)-তে দেখানো হয়েছে)। কিন্তু <strong>দুই চার্জের বাইরে সংযোজক সরলরেখার বর্ধিতাংশে</strong> <span class="math-sci"><span class="vec">E</span><sub>1</sub></span> এবং <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> <strong>একই দিকে</strong> ক্রিয়া করে!
+              </p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2">
+              <div class="font-bold text-slate-900">বহিস্থ বিন্দুতে (<span class="math-sci"><span class="vec">E</span><sub>1</sub> = <span class="vec">E</span><sub>2</sub></span>) দূরত্ব নির্ণয়:</div>
+              <p>ছোট মানের চার্জ <span class="math-sci">${p.smallerChargeName}</span> এর বাইরের দিকে <span class="math-sci">x</span> দূরত্বে (অর্থাৎ অপর চার্জ <span class="math-sci">${p.largerChargeName}</span> থেকে <span class="math-sci">d + x</span> দূরত্বে) <span class="math-sci">P<sub>out</sub></span> বিন্দুতে তীব্রতা সমান হবে:</p>
+              <div class="math-eq text-xs sm:text-sm py-1">
+                শর্তমতে, <span class="fraction"><span class="num">|${p.smallerChargeName}|</span><span class="den">x<sup>2</sup></span></span> = <span class="fraction"><span class="num">|${p.largerChargeName}|</span><span class="den">(d + x)<sup>2</sup></span></span>
+                &nbsp;<span class="font-bold text-indigo-700">&rArr;</span>&nbsp; x = <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.smallerChargeName}|</span></span></span><span class="den"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.largerChargeName}|</span></span> - <span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.smallerChargeName}|</span></span></span></span> &times; d
+              </div>
+              <div class="pt-2 border-t border-slate-200 text-slate-900 font-bold text-sm sm:text-base">
+                সুতরাং, নির্ণেয় অবস্থান: দুই চার্জের বাইরে ছোট চার্জ <span class="math-sci">${p.smallerChargeName}</span> হতে <span class="text-purple-700">${formatDualHTML(xExtSmall, 'm', 3)}</span> এবং বড় চার্জ <span class="math-sci">${p.largerChargeName}</span> হতে <span class="text-purple-700">${formatDualHTML(xExtLarge, 'm', 3)}</span> দূরত্বে তড়িৎ তীব্রতা (<span class="math-sci"><span class="vec">E</span><sub>1</sub> = <span class="vec">E</span><sub>2</sub></span>) মান ও দিকে সমান।
+                <div class="text-xs font-normal text-slate-600 mt-1">
+                  (নোট: আর দুই চার্জের মাঝে <span class="math-sci">q<sub>1</sub></span> হতে ${formatDualHTML(p.xInternal, 'm', 3)} দূরে কেবল তীব্রতার <strong>মান</strong> সমান কিন্তু দিক বিপরীত।)
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      cards.push({
+        id: 'q2',
+        html: `
+          <article class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-emerald-50 to-slate-50 px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold text-sm">প্রশ্ন ২</span>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">সংযোজক সরলরেখা বরাবর কোথায় তড়িৎ তীব্রতা সমান (<span class="math-sci"><span class="vec">E</span><sub>1</sub> = <span class="vec">E</span><sub>2</sub></span>)?</h3>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">ভেক্টর সমতা (মান ও দিক উভয়ই এক)</span>
+            </div>
+            <div class="p-5 space-y-4 text-sm leading-relaxed text-slate-700">
+              ${card2Body}
+            </div>
+          </article>
+        `
+      });
+
+      // CARD 3(a): সংযোজক সরলরেখা বরাবর কোথায় তড়িৎ তীব্রতার মান সমান (|E1| = |E2|)
+      let card3aBody = '';
+      if (p.eitherZero) {
+        card3aBody = `<p class="text-amber-700 font-medium">একটি চার্জ শূন্য হওয়ায় সসীম দূরত্বে তীব্রতার মান সমান হবে না।</p>`;
+      } else {
+        const extSectionHtml = p.hasExternal ? `
+          <div class="bg-purple-50/70 rounded-xl p-4 border border-purple-200 space-y-2">
+            <div class="font-bold text-purple-950">২য় অবস্থান (বহিস্থ বিন্দু <span class="math-sci">P<sub>out</sub></span> &mdash; দুই চার্জের বাইরে):</div>
+            <p class="text-xs sm:text-sm">যেহেতু <span class="math-sci">|q<sub>1</sub>| &ne; |q<sub>2</sub>|</span>, তাই ছোট মানের চার্জ <span class="math-sci">${p.smallerChargeName}</span> এর বাইরের পাশে <span class="math-sci">x'</span> দূরত্বেও তীব্রতার মান সমান হবে:</p>
+            <div class="math-eq text-xs sm:text-sm py-1">
+              <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.smallerChargeName}|</span></span></span><span class="den">x'</span></span> = <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.largerChargeName}|</span></span></span><span class="den">d + x'</span></span>
+              &nbsp;<span class="font-bold text-indigo-700">&rArr;</span>&nbsp; x' = <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.smallerChargeName}|</span></span></span><span class="den"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.largerChargeName}|</span></span> - <span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.smallerChargeName}|</span></span></span></span> &times; d
+            </div>
+            <div class="font-bold text-slate-900 pt-1">
+              সুতরাং, ছোট চার্জ <span class="math-sci">${p.smallerChargeName}</span> হতে বাইরে <span class="text-purple-700">${formatDualHTML(p.absQ1 < p.absQ2 ? p.distFromQ1_ext : p.distFromQ2_ext, 'm', 3)}</span> দূরত্বে (এবং বড় চার্জ <span class="math-sci">${p.largerChargeName}</span> হতে <span class="text-purple-700">${formatDualHTML(p.absQ1 < p.absQ2 ? p.distFromQ2_ext : p.distFromQ1_ext, 'm', 3)}</span> দূরত্বে) তীব্রতার মান সমান: <span class="math-sci">|<span class="vec">E</span><sub>1</sub>| = |<span class="vec">E</span><sub>2</sub>| = ${formatSciHTML(p.E_external_single, 2)} N&middot;C<sup>-1</sup></span>।
+            </div>
+          </div>
+        ` : `
+          <div class="bg-slate-100 rounded-xl p-4 border border-slate-200 text-xs sm:text-sm text-slate-700">
+            <strong>বহিস্থ বিন্দুর ক্ষেত্রে:</strong> যেহেতু উভয় চার্জের পরম মান সমান (<span class="math-sci">|q<sub>1</sub>| = |q<sub>2</sub>|</span>), তাই দুই চার্জের বাইরে কোনো সসীম বিন্দুতে তীব্রতার মান সমান হতে পারে না (কারণ বাইরের যেকোনো বিন্দু সর্বদা একটি চার্জের কাছে এবং অপর চার্জ থেকে দূরে থাকবে)।
+          </div>
+        `;
+
+        card3aBody = `
+          <p class="text-xs sm:text-sm text-slate-600">
+            এখানে শুধুমাত্র <strong>তড়িৎ তীব্রতার মান (<span class="math-sci">|<span class="vec">E</span><sub>1</sub>| = |<span class="vec">E</span><sub>2</sub>|</span>)</strong> সমান হওয়া চাওয়া হয়েছে (দিক একই হোক বা বিপরীত হোক)। চার্জের মান অসমান হলে সংযোজক সরলরেখায় <strong>দুইটি বিন্দুতে</strong> (একটি অন্তঃস্থ ও একটি বহিস্থ) তীব্রতার মান সমান হয়:
+          </p>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="bg-emerald-50/70 rounded-xl p-4 border border-emerald-200 space-y-2">
+              <div class="font-bold text-emerald-950">১ম অবস্থান (অন্তঃস্থ বিন্দু <span class="math-sci">P<sub>in</sub></span> &mdash; দুই চার্জের মাঝে):</div>
+              <p class="text-xs sm:text-sm">ধরি, <span class="math-sci">q<sub>1</sub></span> হতে <span class="math-sci">x</span> দূরে এবং <span class="math-sci">q<sub>2</sub></span> হতে <span class="math-sci">(d - x)</span> দূরে তীব্রতার মান সমান:</p>
+              <div class="math-eq text-xs sm:text-sm py-1">
+                <span class="fraction"><span class="num">|q<sub>1</sub>|</span><span class="den">x<sup>2</sup></span></span> = <span class="fraction"><span class="num">|q<sub>2</sub>|</span><span class="den">(d - x)<sup>2</sup></span></span>
+                &nbsp;<span class="font-bold text-indigo-700">&rArr;</span>&nbsp; x = <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span></span><span class="den"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span> + <span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>2</sub>|</span></span></span></span> &times; d
+              </div>
+              <div class="font-bold text-slate-900 pt-1">
+                সুতরাং, দুই চার্জের মাঝে <span class="math-sci">q<sub>1</sub></span> হতে <span class="text-emerald-700">${formatDualHTML(p.xInternal, 'm', 3)}</span> এবং <span class="math-sci">q<sub>2</sub></span> হতে <span class="text-emerald-700">${formatDualHTML(p.dMinusXInternal, 'm', 3)}</span> দূরত্বে তীব্রতার মান সমান: <span class="math-sci">|<span class="vec">E</span><sub>1</sub>| = |<span class="vec">E</span><sub>2</sub>| = ${formatSciHTML(p.E_internal_single, 2)} N&middot;C<sup>-1</sup></span>।
+              </div>
+            </div>
+            ${extSectionHtml}
+          </div>
+        `;
+      }
+
+      cards.push({
+        id: 'q3a',
+        html: `
+          <article class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-50 to-slate-50 px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded-lg bg-blue-600 text-white font-bold text-sm">প্রশ্ন ৩ (ক)</span>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">সংযোজক সরলরেখা বরাবর কোথায় তড়িৎ তীব্রতার মান সমান (<span class="math-sci">|<span class="vec">E</span><sub>1</sub>| = |<span class="vec">E</span><sub>2</sub>|</span>)?</h3>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">স্কেলার মান সমতা</span>
+            </div>
+            <div class="p-5 space-y-4 text-sm leading-relaxed text-slate-700">
+              ${card3aBody}
+            </div>
+          </article>
+        `
+      });
+
+      // CARD 3(b): সংযোজক সরলরেখা বরাবর কোথায় তড়িৎ তীব্রতা শূন্য (E_net = 0)
+      let card3bBody = '';
+      if (p.eitherZero) {
+        card3bBody = `<p class="text-amber-700 font-medium">একটি চার্জ শূন্য হওয়ায় সসীম দূরত্বে লব্ধি তড়িৎ তীব্রতা শূন্য হবে না।</p>`;
+      } else if (p.sameSign) {
+        card3bBody = `
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2">
+            <div class="font-bold text-emerald-950">ভৌত কারণ (সমধর্মী চার্জের ক্ষেত্রে নিরপেক্ষ বিন্দু কেন মাঝে হয়?):</div>
+            <p class="text-xs sm:text-sm">
+              লব্ধি তড়িৎ তীব্রতা শূন্য (<span class="math-sci"><span class="vec">E</span><sub>net</sub> = <span class="vec">E</span><sub>1</sub> + <span class="vec">E</span><sub>2</sub> = 0</span>) হওয়ার জন্য <span class="math-sci"><span class="vec">E</span><sub>1</sub></span> এবং <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> এর <strong>মান সমান</strong> এবং <strong>দিক পরস্পর বিপরীত (Opposite Direction)</strong> হতে হবে। যেহেতু <span class="math-sci">q<sub>1</sub></span> ও <span class="math-sci">q<sub>2</sub></span> উভয়ই <strong>সমধর্মী চার্জ</strong>, তাই এদের <strong>মধ্যবর্তী স্থানে</strong> তড়িৎ প্রাবল্যদ্বয় পরস্পর বিপরীত দিকে ক্রিয়া করে এবং পরস্পরকে নিষ্ক্রিয় করে।
+            </p>
+          </div>
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2">
+            <div class="font-bold text-slate-900">গাণিতিক হিসাব:</div>
+            <p>ধরি, দুই চার্জের মাঝে <span class="math-sci">q<sub>1</sub></span> হতে <span class="math-sci">x</span> দূরত্বে লব্ধি তড়িৎ তীব্রতা শূন্য:</p>
+            <div class="math-eq text-xs sm:text-sm py-1">
+              E<sub>1</sub> = E<sub>2</sub> &nbsp;<span class="font-bold text-indigo-700">&rArr;</span>&nbsp;
+              <span class="fraction"><span class="num">1</span><span class="den">4&pi;&epsilon;<sub>0</sub>K</span></span> &middot; <span class="fraction"><span class="num">|q<sub>1</sub>|</span><span class="den">x<sup>2</sup></span></span> =
+              <span class="fraction"><span class="num">1</span><span class="den">4&pi;&epsilon;<sub>0</sub>K</span></span> &middot; <span class="fraction"><span class="num">|q<sub>2</sub>|</span><span class="den">(d - x)<sup>2</sup></span></span>
+            </div>
+            <div class="math-eq text-xs sm:text-sm py-1">
+              বা, x = <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span></span><span class="den"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span> + <span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>2</sub>|</span></span></span></span> &times; d
+              = <span class="fraction"><span class="num">${formatSciHTML(r1, 3)}</span><span class="den">${formatSciHTML(r1, 3)} + ${formatSciHTML(r2, 3)}</span></span> &times; (${formatSciHTML(p.d, 2)} m)
+            </div>
+            <div class="pt-2 border-t border-slate-200 font-bold text-slate-900 text-sm sm:text-base">
+              সুতরাং, নির্ণেয় শূন্য প্রাবল্য বিন্দু: দুই চার্জের <strong>মাঝে</strong> <span class="math-sci">q<sub>1</sub></span> হতে <span class="text-emerald-700">${formatDualHTML(p.xInternal, 'm', 3)}</span> এবং <span class="math-sci">q<sub>2</sub></span> হতে <span class="text-emerald-700">${formatDualHTML(p.dMinusXInternal, 'm', 3)}</span> দূরত্বে তড়িৎ তীব্রতা শূন্য হবে।
+            </div>
+          </div>
+        `;
+      } else {
+        // Opposite sign charges for E_net = 0
+        if (p.equalMag) {
+          card3bBody = `
+            <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-2 text-rose-950">
+              <div class="font-bold text-base">সিদ্ধান্ত: সংযোজক সরলরেখার কোনো সসীম বিন্দুতেই তড়িৎ তীব্রতা শূন্য হবে না!</div>
+              <p class="text-xs sm:text-sm">
+                <strong>কারণ:</strong> চার্জ দুটি বিপরীতধর্মী হওয়ায় এদের মধ্যবর্তী স্থানে <span class="math-sci"><span class="vec">E</span><sub>1</sub></span> ও <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> একই দিকে ক্রিয়া করে (যোগ হয়)। আর চার্জ দুটির বাইরে <span class="math-sci"><span class="vec">E</span><sub>1</sub></span> ও <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> বিপরীতমুখী হলেও চার্জ দুটির মান সমান (<span class="math-sci">|q<sub>1</sub>| = |q<sub>2</sub>| = ${formatSciHTML(p.absQ1, 2)} C</span>) হওয়ায় সমীকরণ <span class="math-sci">x = <span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span> / (<span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>2</sub>|</span></span> - <span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span>) &times; d</span> এ হর শূন্য (<span class="math-sci">0</span>) হয়ে যায়, অর্থাৎ <span class="math-sci">x = &infin;</span>। তাই সসীম দূরত্বে কোথাও তড়িৎ তীব্রতা শূন্য হবে না।
+              </p>
+            </div>
+          `;
+        } else {
+          const xExtSmall = p.absQ1 < p.absQ2 ? p.distFromQ1_ext : p.distFromQ2_ext;
+          const xExtLarge = p.absQ1 < p.absQ2 ? p.distFromQ2_ext : p.distFromQ1_ext;
+          const qSmallVal = Math.min(p.absQ1, p.absQ2);
+          const qLargeVal = Math.max(p.absQ1, p.absQ2);
+          const rSmall = Math.sqrt(qSmallVal);
+          const rLarge = Math.sqrt(qLargeVal);
+
+          card3bBody = `
+            <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 space-y-2">
+              <div class="font-bold text-purple-950">ভৌত কারণ (বিপরীতধর্মী চার্জের ক্ষেত্রে শূন্য প্রাবল্য বিন্দু কেন বাইরে হয়?):</div>
+              <p class="text-xs sm:text-sm">
+                যেহেতু <span class="math-sci">q<sub>1</sub></span> ও <span class="math-sci">q<sub>2</sub></span> <strong>বিপরীতধর্মী চার্জ</strong>, তাই দুই চার্জের মধ্যবর্তী স্থানে <span class="math-sci"><span class="vec">E</span><sub>1</sub></span> ও <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> একই দিকে ক্রিয়া করে&mdash;ফলে মাঝে কখনোই লব্ধি তীব্রতা শূন্য হতে পারে না। কিন্তু <strong>দুই চার্জের বাইরে</strong> সংযোজক সরলরেখার বর্ধিতাংশে ছোট মানের চার্জ (<span class="math-sci">${p.smallerChargeName}</span>) এর পাশে <span class="math-sci"><span class="vec">E</span><sub>1</sub></span> ও <span class="math-sci"><span class="vec">E</span><sub>2</sub></span> পরস্পর বিপরীত দিকে ক্রিয়া করে এবং একটি নির্দিষ্ট দূরত্বে সমান ও বিপরীত হয়ে লব্ধি শূন্য করে!
+              </p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2">
+              <div class="font-bold text-slate-900">গাণিতিক হিসাব:</div>
+              <p>ধরি, ছোট চার্জ <span class="math-sci">${p.smallerChargeName}</span> (${formatSciHTML(qSmallVal, 2)} C) থেকে বাইরে <span class="math-sci">x</span> দূরত্বে এবং বড় চার্জ <span class="math-sci">${p.largerChargeName}</span> (${formatSciHTML(qLargeVal, 2)} C) থেকে <span class="math-sci">(d + x)</span> দূরত্বে তড়িৎ তীব্রতা শূন্য:</p>
+              <div class="math-eq text-xs sm:text-sm py-1">
+                E<sub>1</sub> = E<sub>2</sub> &nbsp;<span class="font-bold text-indigo-700">&rArr;</span>&nbsp;
+                <span class="fraction"><span class="num">|${p.smallerChargeName}|</span><span class="den">x<sup>2</sup></span></span> =
+                <span class="fraction"><span class="num">|${p.largerChargeName}|</span><span class="den">(d + x)<sup>2</sup></span></span>
+                &nbsp;<span class="font-bold text-indigo-700">&rArr;</span>&nbsp;
+                <span class="fraction"><span class="num">${formatSciHTML(qSmallVal, 2)}</span><span class="den">x<sup>2</sup></span></span> =
+                <span class="fraction"><span class="num">${formatSciHTML(qLargeVal, 2)}</span><span class="den">(${formatSciHTML(p.d, 2)} + x)<sup>2</sup></span></span>
+              </div>
+              <div class="math-eq text-xs sm:text-sm py-1">
+                বা, x = <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.smallerChargeName}|</span></span></span><span class="den"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.largerChargeName}|</span></span> - <span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.smallerChargeName}|</span></span></span></span> &times; d
+                = <span class="fraction"><span class="num">${formatSciHTML(rSmall, 3)}</span><span class="den">${formatSciHTML(rLarge, 3)} - ${formatSciHTML(rSmall, 3)}</span></span> &times; (${formatSciHTML(p.d, 2)} m)
+              </div>
+              <div class="pt-2 border-t border-slate-200 font-bold text-slate-900 text-sm sm:text-base">
+                সুতরাং, নির্ণেয় শূন্য প্রাবল্য বিন্দু: সংযোজক সরলরেখার <strong>বাইরে</strong> ছোট মানের চার্জ <span class="math-sci">${p.smallerChargeName}</span> হতে <span class="text-purple-700">${formatDualHTML(xExtSmall, 'm', 3)}</span> এবং বড় চার্জ <span class="math-sci">${p.largerChargeName}</span> হতে <span class="text-purple-700">${formatDualHTML(xExtLarge, 'm', 3)}</span> দূরত্বে তড়িৎ তীব্রতা শূন্য (<span class="math-sci"><span class="vec">E</span><sub>net</sub> = 0</span>) হবে।
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      cards.push({
+        id: 'q3b',
+        html: `
+          <article class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-50 to-slate-50 px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded-lg bg-purple-600 text-white font-bold text-sm">প্রশ্ন ৩ (খ)</span>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">সংযোজক সরলরেখা বরাবর কোথায় তড়িৎ তীব্রতা শূন্য (<span class="math-sci"><span class="vec">E</span><sub>net</sub> = 0</span>)?</h3>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300">লব্ধি প্রাবল্য শূন্য (নিরপেক্ষ বিন্দু)</span>
+            </div>
+            <div class="p-5 space-y-4 text-sm leading-relaxed text-slate-700">
+              ${card3bBody}
+            </div>
+          </article>
+        `
+      });
+
+      // CARD 4: সংযোজক সরলরেখা বরাবর কোথায় একটি একক ধনাত্মক চার্জ (+1 C) স্থাপন করলে কোনো বল অনুভব করবে না
+      let card4Body = '';
+      if (p.eitherZero) {
+        card4Body = `<p class="text-amber-700 font-medium">একটি চার্জ শূন্য হওয়ায় অপর চার্জটির প্রভাবে সসীম দূরত্বে সর্বদা বল ক্রিয়া করবে।</p>`;
+      } else if (p.sameSign) {
+        card4Body = `
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
+            <div class="font-bold text-amber-950">ভৌত তত্ত্ব:</div>
+            <p class="text-xs sm:text-sm">
+              কোনো বিন্দুতে লব্ধি তড়িৎ তীব্রতা <span class="math-sci"><span class="vec">E</span><sub>net</sub></span> হলে সেখানে একটি একক ধনাত্মক চার্জ (<span class="math-sci">q<sub>0</sub> = +1 C</span>) স্থাপন করলে তার ওপর প্রযুক্ত লব্ধি বল হলো <span class="math-sci"><span class="vec">F</span><sub>net</sub> = q<sub>0</sub><span class="vec">E</span><sub>net</sub> = 1 &times; <span class="vec">E</span><sub>net</sub></span>।
+              সুতরাং, একক ধনাত্মক চার্জটি <strong>কোনো বল অনুভব করবে না (<span class="math-sci"><span class="vec">F</span><sub>net</sub> = 0</span>)</strong> ঠিক সেই বিন্দুতে যেখানে <span class="math-sci">q<sub>1</sub></span> ও <span class="math-sci">q<sub>2</sub></span> কর্তৃক প্রযুক্ত বলদ্বয় সমান ও বিপরীতমুখী (<span class="math-sci">F<sub>1</sub> = F<sub>2</sub></span>), অর্থাৎ যেখানে <strong>লব্ধি তড়িৎ তীব্রতা শূন্য (<span class="math-sci"><span class="vec">E</span><sub>net</sub> = 0</span>)</strong>।
+            </p>
+          </div>
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2">
+            <div class="font-bold text-slate-900">বল-ভারসাম্য সমীকরণ:</div>
+            <p>চার্জদ্বয় সমধর্মী হওয়ায় এদের মধ্যবর্তী স্থানে <span class="math-sci">q<sub>1</sub></span> হতে <span class="math-sci">x</span> দূরে <span class="math-sci">+1 C</span> চার্জ স্থাপন করলে:</p>
+            <div class="math-eq text-xs sm:text-sm py-1">
+              ১ম চার্জ কর্তৃক বল, F<sub>1</sub> = <span class="fraction"><span class="num">1</span><span class="den">4&pi;&epsilon;<sub>0</sub>K</span></span> &middot; <span class="fraction"><span class="num">|q<sub>1</sub>| &times; 1</span><span class="den">x<sup>2</sup></span></span>
+              &nbsp; এবং &nbsp;
+              ২য় চার্জ কর্তৃক বল, F<sub>2</sub> = <span class="fraction"><span class="num">1</span><span class="den">4&pi;&epsilon;<sub>0</sub>K</span></span> &middot; <span class="fraction"><span class="num">|q<sub>2</sub>| &times; 1</span><span class="den">(d - x)<sup>2</sup></span></span>
+            </div>
+            <div class="math-eq text-xs sm:text-sm py-1">
+              বল অনুভব না করার শর্তানুসারে, F<sub>1</sub> = F<sub>2</sub> &nbsp;<span class="font-bold text-indigo-700">&rArr;</span>&nbsp;
+              x = <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span></span><span class="den"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>1</sub>|</span></span> + <span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|q<sub>2</sub>|</span></span></span></span> &times; d = ${formatDualHTML(p.xInternal, 'm', 3)}
+            </div>
+            <div class="pt-2 border-t border-slate-200 font-bold text-slate-900 text-sm sm:text-base">
+              সুতরাং, নির্ণেয় অবস্থান: সংযোজক সরলরেখার <strong>মধ্যবর্তী স্থানে</strong> <span class="math-sci">q<sub>1</sub></span> হতে <span class="text-emerald-700">${formatDualHTML(p.xInternal, 'm', 3)}</span> এবং <span class="math-sci">q<sub>2</sub></span> হতে <span class="text-emerald-700">${formatDualHTML(p.dMinusXInternal, 'm', 3)}</span> দূরত্বে একটি একক ধনাত্মক চার্জ (+1 C) স্থাপন করলে তা কোনো বল অনুভব করবে না (প্রত্যেক চার্জ কর্তৃক প্রযুক্ত বল <span class="math-sci">F<sub>1</sub> = F<sub>2</sub> = ${formatSciHTML(p.E_internal_single, 2)} N</span> পরস্পরকে নিষ্ক্রিয় করে)।
+            </div>
+          </div>
+        `;
+      } else {
+        if (p.equalMag) {
+          card4Body = `
+            <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-2 text-rose-950">
+              <div class="font-bold">সিদ্ধান্ত: সংযোজক সরলরেখার কোথাও একক ধনাত্মক চার্জ বলমুক্ত থাকবে না!</div>
+              <p class="text-xs sm:text-sm">
+                যেহেতু চার্জ দুটি সমমানের ও বিপরীতধর্মী (<span class="math-sci">|q<sub>1</sub>| = |q<sub>2</sub>|</span>), তাই সংযোজক সরলরেখার কোনো সসীম বিন্দুতেই <span class="math-sci">F<sub>1</sub></span> ও <span class="math-sci">F<sub>2</sub></span> সমান ও বিপরীত হতে পারে না। ফলে <span class="math-sci">+1 C</span> চার্জ স্থাপন করলে সর্বত্রই একটি লব্ধি বল অনুভব করবে।
+              </p>
+            </div>
+          `;
+        } else {
+          const xExtSmall = p.absQ1 < p.absQ2 ? p.distFromQ1_ext : p.distFromQ2_ext;
+          const xExtLarge = p.absQ1 < p.absQ2 ? p.distFromQ2_ext : p.distFromQ1_ext;
+          card4Body = `
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
+              <div class="font-bold text-amber-950">ভৌত তত্ত্ব:</div>
+              <p class="text-xs sm:text-sm">
+                একক ধনাত্মক চার্জ (<span class="math-sci">q<sub>0</sub> = +1 C</span>) এর ওপর প্রযুক্ত বল <span class="math-sci"><span class="vec">F</span><sub>net</sub> = (+1 C) &times; <span class="vec">E</span><sub>net</sub></span>। চার্জ দুটি বিপরীতধর্মী হওয়ায় এদের মাঝে স্থাপিত <span class="math-sci">+1 C</span> চার্জকে একটি চার্জ আকর্ষণ ও অপরটি একই দিকে বিকর্ষণ করে। তাই কেবল <strong>সংযোজক রেখার বাইরে ছোট মানের চার্জ (<span class="math-sci">${p.smallerChargeName}</span>) এর পাশে</strong> আকর্ষণ ও বিকর্ষণ বল পরস্পর বিপরীতমুখী ও সমান (<span class="math-sci">F<sub>1</sub> = F<sub>2</sub></span>) হতে পারে।
+              </p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2">
+              <div class="font-bold text-slate-900">বল-ভারসাম্য সমীকরণ:</div>
+              <p>ছোট চার্জ <span class="math-sci">${p.smallerChargeName}</span> হতে বাইরে <span class="math-sci">x</span> দূরত্বে <span class="math-sci">+1 C</span> চার্জ স্থাপন করলে:</p>
+              <div class="math-eq text-xs sm:text-sm py-1">
+                F<sub>1</sub> = F<sub>2</sub> &nbsp;<span class="font-bold text-indigo-700">&rArr;</span>&nbsp;
+                <span class="fraction"><span class="num">1</span><span class="den">4&pi;&epsilon;<sub>0</sub>K</span></span> &middot; <span class="fraction"><span class="num">|${p.smallerChargeName}| &times; 1</span><span class="den">x<sup>2</sup></span></span> =
+                <span class="fraction"><span class="num">1</span><span class="den">4&pi;&epsilon;<sub>0</sub>K</span></span> &middot; <span class="fraction"><span class="num">|${p.largerChargeName}| &times; 1</span><span class="den">(d + x)<sup>2</sup></span></span>
+              </div>
+              <div class="math-eq text-xs sm:text-sm py-1">
+                বা, x = <span class="fraction"><span class="num"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.smallerChargeName}|</span></span></span><span class="den"><span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.largerChargeName}|</span></span> - <span class="sqrt-box"><span class="sqrt-rad">&radic;</span><span class="sqrt-content">|${p.smallerChargeName}|</span></span></span></span> &times; d = ${formatDualHTML(xExtSmall, 'm', 3)}
+              </div>
+              <div class="pt-2 border-t border-slate-200 font-bold text-slate-900 text-sm sm:text-base">
+                সুতরাং, নির্ণেয় অবস্থান: সংযোজক সরলরেখার <strong>বাইরে</strong> ছোট চার্জ <span class="math-sci">${p.smallerChargeName}</span> হতে <span class="text-purple-700">${formatDualHTML(xExtSmall, 'm', 3)}</span> এবং বড় চার্জ <span class="math-sci">${p.largerChargeName}</span> হতে <span class="text-purple-700">${formatDualHTML(xExtLarge, 'm', 3)}</span> দূরত্বে একটি একক ধনাত্মক চার্জ (+1 C) স্থাপন করলে তা কোনো বল অনুভব করবে না (সেখানে <span class="math-sci">F<sub>1</sub> = F<sub>2</sub> = ${formatSciHTML(p.E_external_single, 2)} N</span> পরস্পর বিপরীতমুখী হওয়ায় লব্ধি বল শূন্য)।
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      cards.push({
+        id: 'q4',
+        html: `
+          <article class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-50 to-slate-50 px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded-lg bg-amber-600 text-white font-bold text-sm">প্রশ্ন ৪</span>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">সংযোজক সরলরেখা বরাবর কোথায় একটি একক ধনাত্মক চার্জ স্থাপন করলে কোনো বল অনুভব করবে না?</h3>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">লব্ধি বল শূন্য (<span class="vec">F</span> = 0)</span>
+            </div>
+            <div class="p-5 space-y-4 text-sm leading-relaxed text-slate-700">
+              ${card4Body}
+            </div>
+          </article>
+        `
+      });
+
+      // Filter and inject cards
+      const filteredCards = state.activeFilter === 'all'
+        ? cards
+        : cards.filter(c => c.id === state.activeFilter);
+
+      document.getElementById('solutionsContainer').innerHTML = filteredCards.map(c => c.html).join('');
+    }
+
+    function updateAll() {
+      syncInputsUI();
+      renderDiagram();
+      renderSolutions();
+    }
+
+    // Event Listeners Setup
+    window.addEventListener('DOMContentLoaded', () => {
+      // Sign Toggles
+      document.getElementById('q1SignPos').addEventListener('click', () => { state.q1Sign = 1; updateAll(); });
+      document.getElementById('q1SignNeg').addEventListener('click', () => { state.q1Sign = -1; updateAll(); });
+      document.getElementById('q2SignPos').addEventListener('click', () => { state.q2Sign = 1; updateAll(); });
+      document.getElementById('q2SignNeg').addEventListener('click', () => { state.q2Sign = -1; updateAll(); });
+
+      // Charge 1 Mantissa
+      const q1MSlider = document.getElementById('q1MantissaSlider');
+      const q1MInput = document.getElementById('q1MantissaInput');
+      q1MSlider.addEventListener('input', (e) => {
+        state.q1Mantissa = parseFloat(e.target.value) || 0;
+        q1MInput.value = state.q1Mantissa;
+        updateAll();
+      });
+      q1MInput.addEventListener('input', (e) => {
+        let val = parseFloat(e.target.value);
+        if (isNaN(val)) val = 0;
+        if (val < 0) {
+          state.q1Sign = -1;
+          val = Math.abs(val);
+        }
+        state.q1Mantissa = val;
+        q1MSlider.value = Math.min(100, val);
+        updateAll();
+      });
+
+      // Charge 1 Exponent
+      const q1ESlider = document.getElementById('q1ExpSlider');
+      const q1EInput = document.getElementById('q1ExpInput');
+      q1ESlider.addEventListener('input', (e) => {
+        state.q1Exp = parseInt(e.target.value, 10) || 0;
+        q1EInput.value = state.q1Exp;
+        updateAll();
+      });
+      q1EInput.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val)) {
+          state.q1Exp = Math.max(-30, Math.min(30, val));
+          q1ESlider.value = Math.max(-15, Math.min(3, state.q1Exp));
+          updateAll();
+        }
+      });
+
+      // Charge 2 Mantissa
+      const q2MSlider = document.getElementById('q2MantissaSlider');
+      const q2MInput = document.getElementById('q2MantissaInput');
+      q2MSlider.addEventListener('input', (e) => {
+        state.q2Mantissa = parseFloat(e.target.value) || 0;
+        q2MInput.value = state.q2Mantissa;
+        updateAll();
+      });
+      q2MInput.addEventListener('input', (e) => {
+        let val = parseFloat(e.target.value);
+        if (isNaN(val)) val = 0;
+        if (val < 0) {
+          state.q2Sign = -1;
+          val = Math.abs(val);
+        }
+        state.q2Mantissa = val;
+        q2MSlider.value = Math.min(100, val);
+        updateAll();
+      });
+
+      // Charge 2 Exponent
+      const q2ESlider = document.getElementById('q2ExpSlider');
+      const q2EInput = document.getElementById('q2ExpInput');
+      q2ESlider.addEventListener('input', (e) => {
+        state.q2Exp = parseInt(e.target.value, 10) || 0;
+        q2EInput.value = state.q2Exp;
+        updateAll();
+      });
+      q2EInput.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val)) {
+          state.q2Exp = Math.max(-30, Math.min(30, val));
+          q2ESlider.value = Math.max(-15, Math.min(3, state.q2Exp));
+          updateAll();
+        }
+      });
+
+      // Distance Mantissa
+      const dMSlider = document.getElementById('dMantissaSlider');
+      const dMInput = document.getElementById('dMantissaInput');
+      dMSlider.addEventListener('input', (e) => {
+        state.dMantissa = Math.max(0.0001, parseFloat(e.target.value) || 0.1);
+        dMInput.value = state.dMantissa;
+        updateAll();
+      });
+      dMInput.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        if (!isNaN(val) && val > 0) {
+          state.dMantissa = val;
+          dMSlider.value = Math.min(100, val);
+          updateAll();
+        }
+      });
+
+      // Distance Exponent
+      const dESlider = document.getElementById('dExpSlider');
+      const dEInput = document.getElementById('dExpInput');
+      dESlider.addEventListener('input', (e) => {
+        state.dExp = parseInt(e.target.value, 10) || 0;
+        dEInput.value = state.dExp;
+        updateAll();
+      });
+      dEInput.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val)) {
+          state.dExp = Math.max(-15, Math.min(15, val));
+          dESlider.value = Math.max(-6, Math.min(3, state.dExp));
+          updateAll();
+        }
+      });
+
+      // Medium Dielectric K
+      document.getElementById('kMediumInput').addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        if (!isNaN(val) && val >= 1) {
+          state.kMedium = val;
+          updateAll();
+        }
+      });
+
+      // Unit Quick Buttons for Charges
+      document.querySelectorAll('.q-unit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const qNum = Number(btn.getAttribute('data-q'));
+          const expVal = Number(btn.getAttribute('data-exp'));
+          if (qNum === 1) {
+            state.q1Exp = expVal;
+            q1ESlider.value = expVal;
+            q1EInput.value = expVal;
+          } else {
+            state.q2Exp = expVal;
+            q2ESlider.value = expVal;
+            q2EInput.value = expVal;
+          }
+          updateAll();
+        });
+      });
+
+      // Unit Quick Buttons for Distance
+      document.querySelectorAll('.d-unit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const expVal = Number(btn.getAttribute('data-dexp'));
+          state.dExp = expVal;
+          dESlider.value = expVal;
+          dEInput.value = expVal;
+          updateAll();
+        });
+      });
+
+      // Probe Slider & Snap Buttons
+      const probeSlider = document.getElementById('probeSlider');
+      probeSlider.addEventListener('input', (e) => {
+        state.probeRatio = parseFloat(e.target.value) || 0;
+        renderDiagram();
+      });
+
+      document.getElementById('snapInternalBtn').addEventListener('click', () => {
+        const p = getPhysicsValues();
+        if (p.xInternal !== null) {
+          state.probeRatio = p.xInternal / p.d;
+          probeSlider.value = state.probeRatio;
+          renderDiagram();
+        }
+      });
+
+      document.getElementById('snapExternalBtn').addEventListener('click', () => {
+        const p = getPhysicsValues();
+        if (p.hasExternal && p.xExternalCoord !== null) {
+          state.probeRatio = p.xExternalCoord / p.d;
+          probeSlider.min = Math.min(-1.5, state.probeRatio - 0.5);
+          probeSlider.max = Math.max(2.5, state.probeRatio + 0.5);
+          probeSlider.value = state.probeRatio;
+          renderDiagram();
+        }
+      });
+
+      // Question Filter Tabs
+      document.querySelectorAll('.q-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.activeFilter = btn.getAttribute('data-filter');
+          document.querySelectorAll('.q-tab-btn').forEach(b => {
+            if (b.getAttribute('data-filter') === state.activeFilter) {
+              b.className = 'q-tab-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition';
+            } else {
+              b.className = 'q-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+            }
+          });
+          renderSolutions();
+        });
+      });
+
+      // Presets
+      function applyPreset(s1, m1, e1, s2, m2, e2, dm, de) {
+        state.q1Sign = s1; state.q1Mantissa = m1; state.q1Exp = e1;
+        state.q2Sign = s2; state.q2Mantissa = m2; state.q2Exp = e2;
+        state.dMantissa = dm; state.dExp = de;
+        q1MSlider.value = m1; q1MInput.value = m1;
+        q1ESlider.value = e1; q1EInput.value = e1;
+        q2MSlider.value = m2; q2MInput.value = m2;
+        q2ESlider.value = e2; q2EInput.value = e2;
+        dMSlider.value = dm; dMInput.value = dm;
+        dESlider.value = de; dEInput.value = de;
+        const p = getPhysicsValues();
+        if (p.xInternal !== null) {
+          state.probeRatio = p.xInternal / p.d;
+          probeSlider.value = state.probeRatio;
+        }
+        updateAll();
+      }
+
+      document.getElementById('presetOppUnequal').addEventListener('click', () => applyPreset(1, 4, -6, -1, 9, -6, 2, 0));
+      document.getElementById('presetSameUnequal').addEventListener('click', () => applyPreset(1, 4, -6, 1, 9, -6, 2, 0));
+      document.getElementById('presetSameEqual').addEventListener('click', () => applyPreset(1, 6, -6, 1, 6, -6, 1, 0));
+      document.getElementById('presetDipole').addEventListener('click', () => applyPreset(1, 6, -6, -1, 6, -6, 1, 0));
+
+      // Redraw SVG diagram smoothly on viewport resize (mobile <-> desktop)
+      window.addEventListener('resize', () => {
+        renderDiagram();
+      });
+
+      // Initial render
+      updateAll();
+    });
+  </script>
+</body>
+</html>
